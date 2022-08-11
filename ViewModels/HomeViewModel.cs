@@ -73,7 +73,11 @@ public partial class HomeViewModel : ObservableRecipient
             {
                 System.Diagnostics.Debug.WriteLine($"Counting to number: {LatestCountNumber}");
                 LatestCountNumber++;
-                if (LatestCountNumber == 1981) //Missing number
+                if (LatestCountNumber == 1980) //Missing number by Rews_red#9505
+                    LatestCountNumber++;
+                else if (LatestCountNumber == 2018) //Another missing number by Toon#9209
+                    LatestCountNumber++;
+                else if (LatestCountNumber == 2084) //Another missing number by Reds_red#9505
                     LatestCountNumber++;
                 if (!CountingMessages.Contains(msg))
                 {

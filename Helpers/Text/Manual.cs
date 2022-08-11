@@ -11,6 +11,16 @@ public static class Manual
 {
     public static bool IsNoise(Message input)
     {
+        if (Equals(input.Sender, IsCounting.PreviousCounter))
+        {
+            //Allowed case of double counting
+            if (input.Sender.UserName == "Kojina" && input.Content == "119")
+                goto Proceed;
+            else if (input.Sender.UserName == "Rews_red" && input.Content == "Holy shit it's win")
+                goto Proceed;
+            return true;
+        }
+    Proceed:
         if (input.SendAt.Day == 2 && input.SendAt.Month == 5
             && input.SendAt.Hour == 19 && (input.SendAt.Minute > 41 && input.SendAt.Minute < 45))
         {
@@ -177,7 +187,7 @@ public static class Manual
             }
             return true;
         }
-        else if (IsWithin(input.SendAt, 5, 9) && 
+        else if (IsWithin(input.SendAt, 5, 9) &&
             Between(input.SendAt, "00:32:38", "00:35:10"))
         {
             //The curious case of war joke
@@ -293,11 +303,28 @@ public static class Manual
              * */
             return true;
         }
+        else if (IsWithin(input.SendAt, 5, 20) &&
+            Between(input.SendAt, "21:17:00", "21:19:50"))
+        {
+            //A fillers
+            /*
+             * "526792117385953312","Kojina#1082","20-May-22 09:16:53 PM","2588 Seminal fluid means cum","",""
+             * "437618453155938317","tacktor#9598","20-May-22 09:17:12 PM","How?","",""
+             * "526792117385953312","Kojina#1082","20-May-22 09:17:21 PM","Semen","",""
+             * "526792117385953312","Kojina#1082","20-May-22 09:17:23 PM","Seminal","",""
+             * "526792117385953312","Kojina#1082","20-May-22 09:17:46 PM","So the great seminal flood...","",""
+             * "437618453155938317","tacktor#9598","20-May-22 09:18:28 PM","Fine","",""
+             * "437618453155938317","tacktor#9598","20-May-22 09:19:46 PM","Woman that can give birth are pregnant now","",""
+             * "437618453155938317","tacktor#9598","20-May-22 09:19:57 PM","2589","",""
+             */
+        }
         switch (input.Attachments)
         {
             case "https://cdn.discordapp.com/attachments/969212093213573140/971847841221869598/IMG_2866.jpg":
             case "https://cdn.discordapp.com/attachments/969212093213573140/972895985082724372/unknown.png":
             case "https://cdn.discordapp.com/attachments/969212093213573140/972915118302187520/unknown.png":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/973584916279336980/IMG_1860.jpg":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/973596330087809094/OIP.jpg":
                 return true;
         }
         switch (input.Content)
@@ -321,6 +348,8 @@ public static class Manual
             case "frick":
             case "Fuck":
             case "https://tenor.com/view/reggie-vs-iwata-die-fighting-gif-21420375":
+            case "https://tenor.com/view/troll-pilled-gif-19289988":
+            case "https://tenor.com/view/trollge-uncanny-depressed-sad-trollface-gif-24958563":
             case "I done now":
             case "I don't even know who he is":
             case "I don't know this count or not":
@@ -377,12 +406,21 @@ public static class Manual
             case "😱":
             case "(i'll take 1969)":
             case "also first Hydrogen Bomb test":
+            case "Yeah that count":
+            case "ドナルド・トランプ":
+            case "we're getting into science fiction territory":
+            case "Why":
+            case "why not?":
+            case "https://tenor.com/view/earth-ending-meteorite-meteor-earth-impact-gif-7786046":
+            case "Holy shit it's win":
+            case "20l302":
+            case "Ok you want goes sci fi huh":
                 return true;
             case "133":
             case "234":
                 if (input.Sender.UserName == "Kojina")
                     return true;
-                return false;            
+                return false;
             case "60":/*
          * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
          * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
@@ -480,6 +518,9 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/973071182037401610/Unknown-Battle-2019-poster.jpg", 1942 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/973128346789609533/unknown.png", 1952 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/973128833916080178/unknown.png", 1953 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/973240868490330243/unknown.png", 1985 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/973561582032396288/unknown.png", 2012 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/974294288953405460/unknown.png", 2077 }
     };
 
     public static Dictionary<string, int> MemeReference => new()
@@ -549,5 +590,8 @@ public static class Manual
         { "135....1?", 1351 },
         { "14 69", 1469 },
         { "148o", 1480 },
+        { "2III", 2111 },
+        { "2800+2^5", 2832 },
+        { "X=1000+1850", 2850 }
     };
 }

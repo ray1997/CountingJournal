@@ -11,8 +11,8 @@ using static CountingJournal.Helpers.Text.Manual;
 namespace CountingJournal.Model;
 public static class IsCounting
 {
-    private static User? _lastCount = null;
-    public static void ResetLastSender() => _lastCount = null;
+    public static User? PreviousCounter = null;
+    public static void ResetLastSender() => PreviousCounter = null;
 
     public static async Task<bool> Decide(int number, Message input)
     {
@@ -26,7 +26,7 @@ public static class IsCounting
         int triedThaiText = -1;
         int triedThaiNum = -1;
 
-        if (input.Content == "Jan 10th 1946, First UN meeting (cringe 🤮)")
+        if (input.Content == "2400 im done now")
         {
             System.Diagnostics.Debug.Write("E");
         }
@@ -38,7 +38,7 @@ public static class IsCounting
             {
                 return false;
             }
-            if (Equals(input.Sender, _lastCount))
+            if (Equals(input.Sender, PreviousCounter))
             {
                 //tacktor u/succcguypc: Let say it never happen
                 if (input.Content == "119" && input.Sender.UserName == "Kojina")
@@ -225,7 +225,8 @@ public static class IsCounting
                 goto Retry;
             }
         }
-        _lastCount = input.Sender;
+        PreviousCounter = input.Sender;
         return compare != -1 && (compare - 1 == number);
     }
+
 }
