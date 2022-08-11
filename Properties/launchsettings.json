@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "CountingJournal (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "CountingJournal (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}
