@@ -25,11 +25,17 @@ public static class ScientificAnnotation
         string pattern = @"(\d+.\d+) (\*|×) (\d+)(\D+)";
         
         var match = Regex.Match(input, pattern);
+        try
+        {
+            float initial = float.Parse(match.Groups[1].ValueSpan);
+            float multiply = float.Parse(match.Groups[3].ValueSpan);
+            float power = float.Parse(TinyNumber.ToNormal(match.Groups[4].Value));
+            return Convert.ToInt32(initial * Math.Pow(multiply, power));
+        }
+        catch
+        {
 
-        float initial = float.Parse(match.Groups[1].ValueSpan);
-        float multiply = float.Parse(match.Groups[3].ValueSpan);
-        float power = float.Parse(TinyNumber.ToNormal(match.Groups[4].Value));
-
-        return Convert.ToInt32(initial * Math.Pow(multiply, power));
+        }
+        return -1;
     }
 }

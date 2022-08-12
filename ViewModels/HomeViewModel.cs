@@ -69,6 +69,10 @@ public partial class HomeViewModel : ObservableRecipient
         foreach (var msg in Messages)
         {
             bool decide = await IsCounting.Decide(LatestCountNumber, msg);
+            if (msg.Content == "2588 Seminal fluid means cum")
+            {
+            
+            }
             if (decide)
             {
                 System.Diagnostics.Debug.WriteLine($"Counting to number: {LatestCountNumber}");
@@ -77,8 +81,10 @@ public partial class HomeViewModel : ObservableRecipient
                     LatestCountNumber++;
                 else if (LatestCountNumber == 2018) //Another missing number by Toon#9209
                     LatestCountNumber++;
-                else if (LatestCountNumber == 2084) //Another missing number by Reds_red#9505
+                else if (LatestCountNumber == 2084) //Another missing number by Rews_red#9505
                     LatestCountNumber++;
+                else if (LatestCountNumber == 2787) //Another missing number by Rews_red#9505
+                    latestCountNumber++;
                 if (!CountingMessages.Contains(msg))
                 {
                     CountingMessages.Insert(0, msg);

@@ -10,17 +10,7 @@ namespace CountingJournal.Helpers.Text;
 public static class Manual
 {
     public static bool IsNoise(Message input)
-    {
-        if (Equals(input.Sender, IsCounting.PreviousCounter))
-        {
-            //Allowed case of double counting
-            if (input.Sender.UserName == "Kojina" && input.Content == "119")
-                goto Proceed;
-            else if (input.Sender.UserName == "Rews_red" && input.Content == "Holy shit it's win")
-                goto Proceed;
-            return true;
-        }
-    Proceed:
+    {        
         if (input.SendAt.Day == 2 && input.SendAt.Month == 5
             && input.SendAt.Hour == 19 && (input.SendAt.Minute > 41 && input.SendAt.Minute < 45))
         {
@@ -304,7 +294,7 @@ public static class Manual
             return true;
         }
         else if (IsWithin(input.SendAt, 5, 20) &&
-            Between(input.SendAt, "21:17:00", "21:19:50"))
+            Between(input.SendAt, "21:17:00", "21:19:48"))
         {
             //A fillers
             /*
@@ -318,6 +308,9 @@ public static class Manual
              * "437618453155938317","tacktor#9598","20-May-22 09:19:57 PM","2589","",""
              */
         }
+        else if (input.Content.Contains(":volatile_motes:"))
+            return true;
+
         switch (input.Attachments)
         {
             case "https://cdn.discordapp.com/attachments/969212093213573140/971847841221869598/IMG_2866.jpg":
@@ -347,6 +340,7 @@ public static class Manual
             case "Fine":
             case "frick":
             case "Fuck":
+            case "Fuck that":
             case "https://tenor.com/view/reggie-vs-iwata-die-fighting-gif-21420375":
             case "https://tenor.com/view/troll-pilled-gif-19289988":
             case "https://tenor.com/view/trollge-uncanny-depressed-sad-trollface-gif-24958563":
@@ -358,6 +352,7 @@ public static class Manual
             case "i'm retarded":
             case "im":
             case "ima go  play bw":
+            case "K":
             case "Kidding":
             case "nice":
             case "n o":
@@ -415,18 +410,21 @@ public static class Manual
             case "Holy shit it's win":
             case "20l302":
             case "Ok you want goes sci fi huh":
+            case "Woman that can give birth are pregnant now":
+            case "18 พฤศิกายน 2568 ภาพยนต์เรื่อง *100 Years* ฉายครั้งแรก":
+            case "Doraemon birthday":
+            case "I need to delete this":
+            case "1 (a palindrome)":
                 return true;
             case "133":
             case "234":
                 if (input.Sender.UserName == "Kojina")
                     return true;
                 return false;
-            case "60":/*
-         * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
-         * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
-         * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","4","","" //Count this as 604
-         * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","605","",""
-         */
+            case "60":/* * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
+                       * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
+                       * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","4","","" //Count this as 604
+                       * * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","605","","" */
                 if (input.Sender.UserName == "Rews_red"
                     && IsWithin(input.SendAt, 5, 6)
                     && input.SendAt.Hour == 1 && input.SendAt.Minute == 35)
@@ -434,11 +432,21 @@ public static class Manual
                     return true;
                 }
                 return false;
+            case "277":/* * "526792117385953312","Kojina#1082","25-May-22 08:41:44 PM","2772","",""
+                        * * "267230094395703297","Rews_red#9505","25-May-22 08:43:09 PM","277","","" //Drop this
+                        * * "267230094395703297","Rews_red#9505","25-May-22 08:43:12 PM","3","","" //Keep this
+                        * * "526792117385953312","Kojina#1082","25-May-22 08:44:27 PM","2774","","" */
+                if (input.Sender.UserName == "Rews_red"
+                    && IsWithin(input.SendAt, 5, 25)
+                    && IsAt(input.SendAt, 20, 43, 9))
+                    return true;
+                return false;
             case "203":
             case "~~1~~234":
             case "409":
             case "184":
             case "~~203~~ hehe nothing to see":
+            case "2065 monke stonk":
                 if (input.Sender.UserName == "Rews_red")
                     return true;
                 return false;
@@ -453,6 +461,18 @@ public static class Manual
                     return true;
                 return false;
         }
+        if (Equals(input.Sender, IsCounting.PreviousCounter))
+        {
+            //Allowed case of double counting
+            if (input.Sender.UserName == "Kojina" && input.Content == "119")
+                goto Proceed;
+            else if (input.Sender.UserName == "Rews_red" && input.Content == "Holy shit it's win")
+                goto Proceed;
+            else if (input.Sender.UserName == "tacktor" && input.Content == "2589")
+                goto Proceed;
+            return true;
+        }
+    Proceed:
         return false;
     }
 
@@ -520,7 +540,9 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/973128833916080178/unknown.png", 1953 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/973240868490330243/unknown.png", 1985 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/973561582032396288/unknown.png", 2012 },
-        { "https://cdn.discordapp.com/attachments/969212093213573140/974294288953405460/unknown.png", 2077 }
+        { "https://cdn.discordapp.com/attachments/969212093213573140/974294288953405460/unknown.png", 2077 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/982695340266389554/IMG_0842.png", 2932 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/982976759161057310/unknown.png", 2940 }
     };
 
     public static Dictionary<string, int> MemeReference => new()
@@ -591,7 +613,33 @@ public static class Manual
         { "14 69", 1469 },
         { "148o", 1480 },
         { "2III", 2111 },
+        { "2000+800+30+1", 2831 },
         { "2800+2^5", 2832 },
-        { "X=1000+1850", 2850 }
+        { "2845+1", 2846 },
+        { "2848-1", 2847 },
+        { "X=1000+1850", 2850 },
+        { "(2000×(⁴²⁰∕₄₂₀))+((20×20)×2)+(100÷(√4))+(2³)", 2858 },
+        { "(41x69)+31", 2860 },
+        { "B2D", 2861 }, //Hexdecimal
+        { "(420×69)-26118", 2862 },
+        { "(420×69)-26117", 2863 },
+        { "2869+3", 2872 },
+        { "28cyberpunk77", 2877 },
+        { "song-phan-phad-roi-kaw-sip-jed", 2897 },
+        { "song-phan-phad-roi-kaw-sip-phad", 2898 },
+        { "song-phan-paed-roi-kaw-sip-kaw", 2899 },
+        { "Song-phan-kaw-roi", 2900 },
+        { "song-phan-kaw-roi-ed", 2901 },
+        { "Söŋṕan kawröj söŋ", 2902 },
+        { "2008+900", 2908 },
+        { "2913+1", 2914 },
+        { "Songpan kawroy sip jed", 2917 },
+        { "2919 - 1", 2918 },
+        { "2929-10", 2919 },
+        { "2929-8", 2921 },
+        { "Söŋṕan kawröj jisib päd", 2928 },
+        { "ສອງພັນເກົ້າຮ້ອຍສາມສິບເອັດ", 2931 },
+        { "ຊາວເກົ້າ ແລະ ສາມສິບສາມ", 2933 },
+        { "໒໙໓໕", 2935 }
     };
 }

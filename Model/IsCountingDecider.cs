@@ -45,13 +45,19 @@ public static class IsCounting
                     goto NeverHappen;
                 return false;
             }
+            
             //Split count info
             if (TimeHelper.IsWithin(input.SendAt, 5, 6) &&
-            input.SendAt.Hour == 1 && input.SendAt.Minute == 35 &&
-            input.Sender.UserName == "Rews_red" && input.Content == "4")
+                TimeHelper.IsAt(input.SendAt, 1, 35, 24) &&
+                input.Sender.UserName == "Rews_red" && input.Content == "4")
             {
                 msg = 604.ToString();
             }
+            else if (TimeHelper.IsWithin(input.SendAt, 5, 25) &&
+                TimeHelper.IsAt(input.SendAt, 20, 43, 12) &&
+                input.Sender.UserName == "Rews_red" && input.Content == "3")
+                msg = 2773.ToString();
+
             if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
                 input.SendAt.Hour == 21 && input.SendAt.Minute == 11 &&
                 input.Sender.UserName == "Rews_red")
@@ -61,6 +67,36 @@ public static class IsCounting
                 if (msg == "-3")
                     msg = "";
             }
+            else if (TimeHelper.IsWithin(input.SendAt, 5, 21) &&
+                TimeHelper.Between(input.SendAt, "12:50:00", "13:07:25"))
+            {
+                if (input.Sender.UserName == "BackScrasher" && input.Content == "2636")
+                    goto NeverHappen;
+                if (input.Sender.UserName == "Aekkawin" && input.Content == "2738")
+                {
+                    msg = input.Content.Replace('7', '6');
+                    goto NeverHappen;
+                }
+                msg = input.Content.Replace('9', '6');
+                //The 6 9 incident
+                /*
+                 * "267230094395703297","Rews_red#9505","21-May-22 11:30:20 AM","2630","",""
+                 * "368658808051990540","ggguy#3542","21-May-22 12:57:02 PM","2931","",""
+                 * "807952989623943189","BackScrasher#4282","21-May-22 01:06:12 PM","2932","",""
+                 * "526792117385953312","Kojina#1082","21-May-22 01:06:31 PM","2933","",""
+                 * "807952989623943189","BackScrasher#4282","21-May-22 01:06:49 PM","2934","",""
+                 * "746178884323639387","Aekkawin#8587","21-May-22 01:06:54 PM","2935","",""
+                 * "807952989623943189","BackScrasher#4282","21-May-22 01:07:12 PM","2636","","" -_-'
+                 * "526792117385953312","Kojina#1082","21-May-22 01:07:17 PM","2937","",""
+                 * "746178884323639387","Aekkawin#8587","21-May-22 01:07:23 PM","2738","","" B R U H
+                 * "807952989623943189","BackScrasher#4282","21-May-22 01:07:27 PM","2639","",""
+                 */
+            }
+            //Small mistake
+            if (input.Sender.UserName == "tacktor" && input.Content == "2473")
+                msg = 2743.ToString();
+            if (input.Content == "28" && input.Attachments == "https://cdn.discordapp.com/attachments/969212093213573140/981555605649117264/unknown.png")
+                msg = 2869.ToString();
         NeverHappen:
             compare = int.Parse(msg);
             if (compare > number + 1 || compare < number)
