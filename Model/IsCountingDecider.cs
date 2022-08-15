@@ -41,7 +41,7 @@ public static class IsCounting
                     goto NeverHappen;
                 return false;
             }
-            
+
             //Split count info
             if (TimeHelper.IsWithin(input.SendAt, 5, 6) &&
                 TimeHelper.IsAt(input.SendAt, 1, 35, 24) &&
@@ -51,6 +51,12 @@ public static class IsCounting
                 TimeHelper.IsAt(input.SendAt, 20, 43, 12) &&
                 input.Sender.UserName == "Rews_red" && input.Content == "3")
                 msg = 2773.ToString();
+            else if (TimeHelper.IsWithin(input.SendAt, 7, 4) && TimeHelper.IsAt(input.SendAt, 12, 2, 42) &&
+                input.Content == "+1" && input.Sender.UserName == "Rews_red")
+                msg = 3753.ToString();
+            else if (TimeHelper.IsWithin(input.SendAt, 7, 4) && TimeHelper.IsAt(input.SendAt, 12, 19, 15) &&
+                input.Content == "+2" && input.Sender.UserName == "tacktor")
+                msg = 3754.ToString();
 
                 if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
                 input.SendAt.Hour == 21 && input.SendAt.Minute == 11 &&
@@ -111,7 +117,7 @@ public static class IsCounting
                 msg = MemeReference[msg].ToString();
                 goto Retry;
             }
-            else if (IllogicalFormula.IsAlright(msg, number + 1))
+            else if (Scatter.IsAlright(msg, number + 1))
             {
                 msg = (number + 1).ToString();
                 goto Retry;

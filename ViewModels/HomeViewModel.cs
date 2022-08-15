@@ -69,10 +69,6 @@ public partial class HomeViewModel : ObservableRecipient
         foreach (var msg in Messages)
         {
             bool decide = await IsCounting.Decide(LatestCountNumber, msg);
-            if (msg.Content == "2588 Seminal fluid means cum")
-            {
-            
-            }
             if (decide)
             {
                 System.Diagnostics.Debug.WriteLine($"Counting to number: {LatestCountNumber}");

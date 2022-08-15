@@ -344,6 +344,17 @@ public static class Manual
              * "267230094395703297","Rews_red#9505","16-Jun-22 11:32:12 PM","it;s supposed to be 3k","",""
              * "371567557989105664","Ranvie#5623","16-Jun-22 11:43:20 PM","3327","","" */
         }
+        else if (IsWithin(input.SendAt, 6, 17) && Between(input.SendAt, "12:06:59", "12:07:45"))
+        {
+            return true;
+            /* "267230094395703297","Rews_red#9505","17-Jun-22 12:06:07 PM","3474","",""
+             * "873840836796903464","arizona ranger#9706","17-Jun-22 12:06:58 PM","3475","",""
+             * "267230094395703297","Rews_red#9505","17-Jun-22 12:07:00 PM","2476","",""
+             * "873840836796903464","arizona ranger#9706","17-Jun-22 12:07:19 PM","wut","",""
+             * "267230094395703297","Rews_red#9505","17-Jun-22 12:07:44 PM","qait","",""
+             * "267230094395703297","Rews_red#9505","17-Jun-22 12:07:48 PM","3476","",""
+             * "873840836796903464","arizona ranger#9706","17-Jun-22 12:07:55 PM","3477","","" */
+        }
 
         else if (input.Content.Contains(":volatile_motes:"))
             return true;
@@ -356,6 +367,8 @@ public static class Manual
             case "https://cdn.discordapp.com/attachments/969212093213573140/973584916279336980/IMG_1860.jpg":
             case "https://cdn.discordapp.com/attachments/969212093213573140/973596330087809094/OIP.jpg":
             case "https://cdn.discordapp.com/attachments/969212093213573140/984099216689336390/unknown.png":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/994048688643121234/unknown.png":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/994525961548738610/Screenshot_20220707-155038_Discord.jpg":
                 return true;
         }
         switch (input.Content)
@@ -460,12 +473,17 @@ public static class Manual
             case "...?":
             case "weee":
             case "Almost ⅓ of the way there!":
+            case "¾⁵⁰":
+            case "Sus":
+            case ":PrayutSus:":
+            case "Cuz z looks like 2":
+            case "Bruh":
+            case "Retar":
+            case "totally didn't forgot that it was 3752 already nope":
+            case "bruh":
+            case "time to countdown":
+            case "3️⃣7️⃣:ninebutton:3️⃣:BlueDot:5️⃣":
                 return true;
-            case "133":
-            case "234":
-                if (input.Sender.UserName == "Kojina")
-                    return true;
-                return false;
             case "60":/* * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
                        * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
                        * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","4","","" //Count this as 604
@@ -494,8 +512,15 @@ public static class Manual
                  */
                 if (input.Sender.UserName == "Rews_red" && IsWithin(input.SendAt, 6, 17)
                     && IsAt(input.SendAt, 11, 52, 35))
-                    return false;
-                return true;
+                    return true;
+                return false;
+            case "-1":
+                /* "267230094395703297","Rews_red#9505","05-Jul-22 08:25:24 AM","3767","",""
+                 * "267230094395703297","Rews_red#9505","05-Jul-22 08:25:29 AM","-1","",""
+                 * "267230094395703297","Rews_red#9505","05-Jul-22 08:25:39 AM","=3766","","" */
+                if (input.Sender.UserName == "Rews_red" && IsWithin(input.SendAt, 7, 5) && IsAt(input.SendAt, 8, 25, 29))
+                    return true;
+                return false;
             case "203":
             case "~~1~~234":
             case "409":
@@ -503,7 +528,14 @@ public static class Manual
             case "~~203~~ hehe nothing to see":
             case "2065 monke stonk":
             case "~~3152~~":
+            case "3767":
                 if (input.Sender.UserName == "Rews_red")
+                    return true;
+                return false;
+            case "133":
+            case "234":
+            case "2548":
+                if (input.Sender.UserName == "Kojina")
                     return true;
                 return false;
             case "~~671~~":
@@ -516,6 +548,10 @@ public static class Manual
                 if (input.Sender.UserName == "tacktor")
                     return true;
                 return false;
+            case "3752":
+                if (input.Sender.UserName == "Toon")
+                    return false;
+                return true;
         }
         if (Equals(input.Sender, IsCounting.PreviousCounter))
         {
@@ -616,6 +652,11 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/987215516299067455/1-33-33-time.jpg", 3333 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/987217522669543454/images.jpeg", 3390 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/987219212894343218/images_1.jpeg", 3434 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/989920202563125248/unknown.png", 3632 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/992068798591025202/42ABEC8F-AECB-4D71-AAB2-ADA620C78870.mp4", 3694 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/992076948123689050/E448F13F-4977-44F6-9041-9DB6E1A71F97.mp4", 3696 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/992087506638098524/unknown.png", 3701 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/992327642525204500/unknown.png", 3709 },
     };
 
     public static Dictionary<string, int> MemeReference => new()
@@ -716,5 +757,17 @@ public static class Manual
         { "336∞", 3368 },
         { "337O", 3370 },
         { "33∞∞", 3388 },
+        { "¾⁴⁴", 3444 },
+        { "¾⅘", 3445 },
+        { "¾⁴⁶", 3446 },
+        { "¾⁴⁷", 3447 },
+        { "¾⁴⁸", 3448 },
+        { "¾⁴⁹", 3449 },
+        { "¾⁵∅", 3450 },
+        { "¾⁵1", 3451 },
+        { "346Z", 3462 },
+        { "364I", 3641 },
+        { "Ǝ642", 3642 },
+        /*{ ":ThaksinThumbsUp: :ThaiChanHi: :ThaiChan: :ThaiSus1:", 3796 },*/
     };
 }

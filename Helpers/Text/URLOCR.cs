@@ -20,6 +20,19 @@ public static class URLOCR
     {
         if (!url.StartsWith("https"))
             return "";
+
+        if (url.EndsWith("jpg"))
+            goto Continue;
+        else if (url.EndsWith("jpeg"))
+            goto Continue;
+        else if (url.EndsWith("png"))
+            goto Continue;
+        else if (url.EndsWith("svg"))
+            goto Continue;
+        else
+            return "";
+
+        Continue:
         if (cached is null)
             await Initialize();
 

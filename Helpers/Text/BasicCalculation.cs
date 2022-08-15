@@ -19,12 +19,33 @@ public static class BasicCalculation
         if (input.Contains('.'))
             return false;
 
-        if (input.Contains(' '))
-            input = input.Replace(" ", string.Empty);
+        foreach (var c in symbols)
+        {
+            if (input.StartsWith(c))
+            {
+                return false;
+            }
+            else if (input.EndsWith(c))
+            {
+                return false;
+            }
+        }
 
-        int testing = input.IndexOfAny(calculateSymbols);
-        if (testing <= 0 || !char.IsDigit(input[testing - 1]) || !char.IsDigit(input[testing + 1])) //Start with symbols or didn't actually found symbols
-            return false;
+        input = input.Replace(" ", string.Empty);
+
+        foreach (char c in input)
+        {
+            bool a = char.IsDigit(c); //Is it a number?
+            bool b = symbols.Contains(c); //Is it a symbol?
+            if (!a && !b) // Don't process it if it's contain something that's not a number or symbol
+                return false;
+        }
+        //if (input.Contains(' '))
+        //    input = input.Replace(" ", string.Empty);
+
+        //int testing = input.IndexOfAny(calculateSymbols);
+        //if (testing <= 0 || !char.IsDigit(input[testing - 1]) || !char.IsDigit(input[testing + 1])) //Start with symbols or didn't actually found symbols
+        //    return false;
 
         return input.Any(c => calculateSymbols.Contains(c) 
         || additionalCalculateSymbols.Contains(c));
@@ -62,22 +83,26 @@ public static class BasicCalculation
         var complexity = input.Count(c => calculateSymbols.Contains(c));
         if (complexity == 1)
         {
-            var position = input.IndexOfAny(calculateSymbols);
-            var first = int.Parse(input[..position].Trim());
-            var second = int.Parse(input[(position + 1)..].Trim());
-            switch (input[position])
+            try
             {
-                case '+':
-                    return (first + second).ToString();
-                case '-':
-                    return (first - second).ToString();
-                case '*':
-                case '×':
-                    return (first * second).ToString();
-                case '/':
-                case '÷':
-                    return (first / second).ToString();
+                var position = input.IndexOfAny(calculateSymbols);
+                var first = int.Parse(input[..position].Trim());
+                var second = int.Parse(input[(position + 1)..].Trim());
+                switch (input[position])
+                {
+                    case '+':
+                        return (first + second).ToString();
+                    case '-':
+                        return (first - second).ToString();
+                    case '*':
+                    case '×':
+                        return (first * second).ToString();
+                    case '/':
+                    case '÷':
+                        return (first / second).ToString();
+                }
             }
+            catch { }
         }
 
 #if DEBUG
@@ -137,5 +162,9 @@ public static class BasicCalculation
         { "5^5 + 1", 3126 },
         { "(55²+5³) -​ (5²-2)", 3127 },
         { "ceil(pi*1000)", 3142 },
+        { "60² + 8² + 1", 3665 },
+        { "3**666** + 1", 3667 },
+        { "3760\r\n-5", 3755 },
+        { "3.7k + 2^6", 3764 },
     };
 }

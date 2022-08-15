@@ -5,31 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CountingJournal.Helpers.Text;
-public static class IllogicalFormula
+public static class Scatter
 {
     public static bool IsAlright(string formula, int expectNumber)
     {
         if (formula.Length <= expectNumber.ToString().Length)
             return false;
-        if (Roman.IsRoman(formula))
-            return false;
-        if (formula.Any())
-        if (!formula.Any(c => BasicCalculation.symbols.Contains(c)))
-            return false;
         try
         {
-            int latestFound = 0;
-            List<NumberOnFormula> expand =
-                new(expectNumber.ToString().ToCharArray().Select(i => new NumberOnFormula() { number = i }));
-            foreach (var num in expand)
+            var expects = expectNumber.ToString().ToCharArray().ToList();
+            var formulas = formula.ToCharArray().ToList();
+            
+            while (expects.Count > 0)
             {
-                num.isInFormula = formula.Contains(num.number);
-                latestFound = formula.IndexOf(num.number, latestFound);
+                int index = -1;
+                index = formulas.IndexOf(expects[0]);
+                if (index == -1)
+                    return false;
+                formulas.Remove(expects[0]);
+                expects.RemoveAt(0);
             }
-            var results = expand.Select(i => i.isInFormula).Distinct();
-            if (results.Count() > 1)
-                return false;
-            return results.First();
+            return true;
         }
         catch
         {
