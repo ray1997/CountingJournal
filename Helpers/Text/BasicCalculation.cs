@@ -30,7 +30,7 @@ public static class BasicCalculation
         || additionalCalculateSymbols.Contains(c));
     }
 
-    public static string Calculate(string input)
+    public static string Calculate(string input, string expectedNumber)
     {
         if (input.Contains('^') && !input.StartsWith('^'))
         {
@@ -40,6 +40,12 @@ public static class BasicCalculation
         }
         if (PreCalculatedFormula.ContainsKey(input))
             return PreCalculatedFormula[input].ToString();
+
+        //Check if it's finished formula
+        if (input.EndsWith(expectedNumber))
+            return expectedNumber;
+        else if (input.StartsWith(expectedNumber))
+            return expectedNumber;
 
         if (input.ToLower().StartsWith("x=")
             || input.ToLower().StartsWith("x =")
@@ -52,6 +58,7 @@ public static class BasicCalculation
             input = input.Replace('x', ' ');
             input = input.Trim();
         }
+
         var complexity = input.Count(c => calculateSymbols.Contains(c));
         if (complexity == 1)
         {
@@ -126,6 +133,9 @@ public static class BasicCalculation
         //{ "2929-8", 2921 },
         { "2900 + 7^2", 2949 },
         { "(2900+7²)+1", 2950 },
-        { "[69²] - ((420 × 4) + (69 + 7))", 3005 },
+        { "[69²] - ((420 × 4) + (69 + 7))", 3005 },        
+        { "5^5 + 1", 3126 },
+        { "(55²+5³) -​ (5²-2)", 3127 },
+        { "ceil(pi*1000)", 3142 },
     };
 }

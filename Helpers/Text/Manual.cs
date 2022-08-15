@@ -308,6 +308,43 @@ public static class Manual
              * "437618453155938317","tacktor#9598","20-May-22 09:19:57 PM","2589","",""
              */
         }
+        else if (IsWithin(input.SendAt, 6, 16) &&
+            Between(input.SendAt, "21:00:00", "23:40:00"))
+        {
+            return true;
+            /*
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 08:53:28 PM","3326","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 09:47:53 PM","2237","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 09:53:51 PM","2238","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 09:54:07 PM","2239","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 09:54:36 PM","2240","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 09:55:13 PM","2241","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 09:55:19 PM","2242 🤫","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 09:56:36 PM","2243","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 09:56:40 PM","2244","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 09:57:02 PM","2245","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 09:57:08 PM","2246","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 09:57:21 PM","2247","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 10:02:50 PM","2248","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 10:36:56 PM","","https://cdn.discordapp.com/attachments/969212093213573140/987017947379810324/8482fbda608a5e63.png","2️⃣ (1),4️⃣ (1),🇿 (1),9️⃣ (1)"
+             * "267230094395703297","Rews_red#9505","16-Jun-22 10:44:53 PM","2250","",""
+             * "250308103105413121","Toon#9209","16-Jun-22 10:53:05 PM","2251","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 11:00:11 PM","2252","",""
+             * "368658808051990540","ggguy#3542","16-Jun-22 11:08:50 PM","2253","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 11:18:21 PM","2254","",""
+             * "437618453155938317","tacktor#9598","16-Jun-22 11:30:21 PM","2255","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:03 PM","2256","",""
+             * "873840836796903464","arizona ranger#9706","16-Jun-22 11:31:29 PM","2257","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:34 PM","2578","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:37 PM","no","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:40 PM","2258","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:50 PM","wait","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:31:51 PM","wat","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:32:00 PM","i am a dumb fuck","",""
+             * "267230094395703297","Rews_red#9505","16-Jun-22 11:32:12 PM","it;s supposed to be 3k","",""
+             * "371567557989105664","Ranvie#5623","16-Jun-22 11:43:20 PM","3327","","" */
+        }
+
         else if (input.Content.Contains(":volatile_motes:"))
             return true;
 
@@ -318,6 +355,7 @@ public static class Manual
             case "https://cdn.discordapp.com/attachments/969212093213573140/972915118302187520/unknown.png":
             case "https://cdn.discordapp.com/attachments/969212093213573140/973584916279336980/IMG_1860.jpg":
             case "https://cdn.discordapp.com/attachments/969212093213573140/973596330087809094/OIP.jpg":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/984099216689336390/unknown.png":
                 return true;
         }
         switch (input.Content)
@@ -356,6 +394,7 @@ public static class Manual
             case "Kidding":
             case "nice":
             case "n o":
+            case "no":
             case "No":
             case "No one saw that":
             case "oh":
@@ -415,6 +454,12 @@ public static class Manual
             case "Doraemon birthday":
             case "I need to delete this":
             case "1 (a palindrome)":
+            case "ใครเก็ทนี่โคตรพ่อค้า":
+            case "changed my mind":
+            case "yeah idk":
+            case "...?":
+            case "weee":
+            case "Almost ⅓ of the way there!":
                 return true;
             case "133":
             case "234":
@@ -441,12 +486,23 @@ public static class Manual
                     && IsAt(input.SendAt, 20, 43, 9))
                     return true;
                 return false;
+            case "3342":
+                /* "873840836796903464","arizona ranger#9706","17-Jun-22 11:52:02 AM","3401 nice","",""
+                 * "267230094395703297","Rews_red#9505","17-Jun-22 11:52:35 AM","3342","",""
+                 * "267230094395703297","Rews_red#9505","17-Jun-22 11:52:39 AM","Wait","",""
+                 * "267230094395703297","Rews_red#9505","17-Jun-22 11:52:43 AM","3402","",""
+                 */
+                if (input.Sender.UserName == "Rews_red" && IsWithin(input.SendAt, 6, 17)
+                    && IsAt(input.SendAt, 11, 52, 35))
+                    return false;
+                return true;
             case "203":
             case "~~1~~234":
             case "409":
             case "184":
             case "~~203~~ hehe nothing to see":
             case "2065 monke stonk":
+            case "~~3152~~":
                 if (input.Sender.UserName == "Rews_red")
                     return true;
                 return false;
@@ -546,23 +602,37 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/983198139387346974/unknown.png", 2955 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/983521766737604618/2976.2976", 2976 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/983734494366404678/unknown.png", 3000 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/984039521232510976/unknown.png", 3009 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/984099545858310164/unknown.png", 3013 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/984106825152622622/unknown.png", 3014 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/984106962918711306/unknown.png", 3015 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985125537359990864/unknown.png", 3041 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985163623963951124/unknown.png", 3050 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985170503436238868/unknown.png", 3060 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985177583224254474/unknown.png", 3065 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985221645956435988/unknown.png", 3070 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985460203640205342/unknown.png", 3080 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/985598085579280504/unknown.png", 3090 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/987215516299067455/1-33-33-time.jpg", 3333 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/987217522669543454/images.jpeg", 3390 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/987219212894343218/images_1.jpeg", 3434 },
     };
 
     public static Dictionary<string, int> MemeReference => new()
     {
-        { "Agent 47", 47 },
+        //{ "Agent 47", 47 },
         { "1 stack", 64 },
         { "black man walking through walls (run)", 106 },
         { "les majeste", 112 },
-        { "einhundert einundsiebzig (171)", 171 },
-        { "พอจะมีสัก... 200 มั้ย?", 200 },
-        { "มั่ย (201)", 201 },
+        //{ "einhundert einundsiebzig (171)", 171 },
+        //{ "พอจะมีสัก... 200 มั้ย?", 200 },
+        //{ "มั่ย (201)", 201 },
         { "两百零三", 203 },
-        { "50% of 420 (210)", 210 },
-        { "มาตรา 288 ผู้ใดฆ่าผู้อื่น ต้องระวางโทษประหารชีวิต จำคุกตลอดชีวิต หรือจำคุกตั้งแต่สิบห้าปีถึงยี่สิบปี", 288 },
-        { "3️⃣ 0️⃣ 🇴", 300 },
-        { "Omega 3, 6, 9", 369 },
-        { "4️⃣ 🇴 🅾️", 400 },
+        //{ "50% of 420 (210)", 210 },
+        //{ "มาตรา 288 ผู้ใดฆ่าผู้อื่น ต้องระวางโทษประหารชีวิต จำคุกตลอดชีวิต หรือจำคุกตั้งแต่สิบห้าปีถึงยี่สิบปี", 288 },
+        //{ "3️⃣ 0️⃣ 🇴", 300 },
+        //{ "Omega 3, 6, 9", 369 },
+        //{ "4️⃣ 🇴 🅾️", 400 },
         //"426 illogical formula" - Kojina, May 2022
         //{ "4=2+2", 422 },
         //{ "4 = 2-4", 424 },
@@ -581,7 +651,7 @@ public static class Manual
         //{ "|sqrt4-5|!=6", 456 },
         //{ "sqrt4+5=7 EZ", 457 },
         //{ "4+5=9 how to cross", 459 },
-        { "use ~~ in front and behind 46/0", 460 },
+        //{ "use ~~ in front and behind 46/0", 460 },
         //{ "sqrt4+6=8", 468 },
         //{ "4+6=9 :ThaksinThumbsUp:", 469 },
         //{ "4-7=-3 rip", 473 },
@@ -598,7 +668,7 @@ public static class Manual
         //{ "f:R+—>R+, f(1)=493\r\n\r\nf(x)+f(y)=f(x+y)\r\n\r\nfor all x,y>0. Find f(x)/x.", 493 }, 
         //HOLY SHIT IT"S FINALLY OVER!!! AWGFHAIWGHQI@H#WGIAOHGNOAIG
         //{ "4.94 × 10²", 494 }, //Scientific annotate
-        { "```cs\r\nusing System;\r\n\r\nnamespace Number496\r\n{\r\n    public class _496\r\n    {\r\n        public int Get496()\r\n        {\r\n            int counter = 0;\r\n            while (counter < 495)\r\n                counter += 5;\r\n            while (counter > 495)\r\n            {\r\n                counter--;\r\n                if (counter == 495)\r\n                {\r\n                    counter += 1;\r\n                    break;\r\n                }\r\n            }\r\n            if (counter == 496)\r\n            {\r\n                System.Diagnostics.Debug.WriteLine(counter);\r\n            }\r\n            if (counter != 496)\r\n            {\r\n                throw new InvalidOperationException();\r\n            }\r\n            return 496;\r\n        }\r\n    }\r\n}\r\n```", 496 },
+        //{ "```cs\r\nusing System;\r\n\r\nnamespace Number496\r\n{\r\n    public class _496\r\n    {\r\n        public int Get496()\r\n        {\r\n            int counter = 0;\r\n            while (counter < 495)\r\n                counter += 5;\r\n            while (counter > 495)\r\n            {\r\n                counter--;\r\n                if (counter == 495)\r\n                {\r\n                    counter += 1;\r\n                    break;\r\n                }\r\n            }\r\n            if (counter == 496)\r\n            {\r\n                System.Diagnostics.Debug.WriteLine(counter);\r\n            }\r\n            if (counter != 496)\r\n            {\r\n                throw new InvalidOperationException();\r\n            }\r\n            return 496;\r\n        }\r\n    }\r\n}\r\n```", 496 },
         //Oh no, it's back..
         //{ "5=3+2", 532 },        
         //{ "5+3=5", 535 },
@@ -608,21 +678,21 @@ public static class Manual
         //{ "𝟓𝟖𝟗", 589 },
         //{ "𝟝𝟡𝟙", 591 },
         { "🁈 🁒 🁀", 593 },
-        { "1 18 8", 1188 },
+        //{ "1 18 8", 1188 },
         { "1~~3~~208", 1208 },
-        { "135....1?", 1351 },
-        { "14 69", 1469 },
+        //{ "135....1?", 1351 },
+        //{ "14 69", 1469 },
         { "148o", 1480 },
-        { "2III", 2111 },      
+        { "2III", 2111 },
         { "B2D", 2861 }, //Hexdecimal
-        { "28cyberpunk77", 2877 },
+        //{ "28cyberpunk77", 2877 },
         { "song-phan-phad-roi-kaw-sip-jed", 2897 },
         { "song-phan-phad-roi-kaw-sip-phad", 2898 },
         { "song-phan-paed-roi-kaw-sip-kaw", 2899 },
         { "Song-phan-kaw-roi", 2900 },
         { "song-phan-kaw-roi-ed", 2901 },
-        { "Söŋṕan kawröj söŋ", 2902 },        
-        { "Songpan kawroy sip jed", 2917 },        
+        { "Söŋṕan kawröj söŋ", 2902 },
+        { "Songpan kawroy sip jed", 2917 },
         { "Söŋṕan kawröj jisib päd", 2928 },
         { "ສອງພັນເກົ້າຮ້ອຍສາມສິບເອັດ", 2931 },
         { "ຊາວເກົ້າ ແລະ ສາມສິບສາມ", 2933 },
@@ -638,5 +708,13 @@ public static class Manual
         { "1993 + 1K", 2993 },
         { "2\n9\n7\n๕", 2975 },
         { "+1\nhttps://c.tenor.com/ZulNSiQ3ErYAAAAM/avengers-endgame-i-love-you3000.gif", 3001 },
+        { "a thousand years later after 2011", 3011 },
+        { "a thousand years later after 2012", 3012 },
+        { "ตรีพันตรีสิบยี่", 3132 },
+        { "ตรีเอ็ดตรีอัฐ", 3138 },
+        { "Trois mille cent quarante-et-un", 3141 },
+        { "336∞", 3368 },
+        { "337O", 3370 },
+        { "33∞∞", 3388 },
     };
 }

@@ -11,6 +11,8 @@ public static class Roman
 
     public static bool IsRoman(string input)// => input.Any(i => romans.Contains(i));
     {
+        if (string.IsNullOrEmpty(input))
+            return false;
         foreach (char c in input)
         {
             if (!romans.Contains(c))

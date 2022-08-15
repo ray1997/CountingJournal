@@ -9,6 +9,10 @@ public static class ThaiTextNumber
 {
     public static int ConvertToNumber(string input)
     {
+        if (!multiply.Keys.Any(key => input.Contains(key)))
+        {
+            return ConvertNumberOnlyText(input);
+        }
         var workingInput = input;
         var number = true;
         var foundedNumber = 0;
@@ -48,6 +52,15 @@ public static class ThaiTextNumber
             }
         }
         return -1;
+    }
+
+    private static int ConvertNumberOnlyText(string input)
+    {
+        foreach (var key in numbers.Keys)
+        {
+            input = input.Replace(key.ToString(), numbers[key].ToString());
+        }
+        return int.Parse(input);
     }
 
     public static bool IsThaiText(string input)

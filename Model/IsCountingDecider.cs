@@ -91,6 +91,10 @@ public static class IsCounting
                 msg = 2743.ToString();
             if (input.Content == "28" && input.Attachments == "https://cdn.discordapp.com/attachments/969212093213573140/981555605649117264/unknown.png")
                 msg = 2869.ToString();
+            if ((input.Content == "8290" || input.Content == "8292") &&
+                input.Sender.UserName == "Rews_red")
+                msg = input.Content.Replace("82", "32");
+
         NeverHappen:
             compare = int.Parse(msg);
             if (compare > number + 1 || compare < number)
@@ -114,20 +118,20 @@ public static class IsCounting
             }
             else if (BasicCalculation.IsBasicCalculation(msg)) //Predetermine formula
             {
+                msg = BasicCalculation.Calculate(msg, (number + 1).ToString());
                 //Before calculate, check if it's already calculate
-                if (msg.EndsWith((number + 1).ToString()))
-                { //2×3×41=246
-                    msg = msg.Substring(msg.LastIndexOf('=') + 1);
-                }
-                else if (msg.StartsWith((number + 1).ToString()))
-                { //250=(10×10+5×5)+(1+2+3+4+5+6+7+8+9+(5×4)+(2.5+2.5)+1
-                    msg = msg.Substring(msg.IndexOf('='));
-                }
-                else
-                {
-                    msg = BasicCalculation.Calculate(msg);
-                    goto Retry;
-                }
+                //if (msg.EndsWith((number + 1).ToString()))
+                //{ //2×3×41=246
+                //    msg = msg.Substring(msg.LastIndexOf('=') + 1);
+                //}
+                //else if (msg.StartsWith((number + 1).ToString()))
+                //{ //250=(10×10+5×5)+(1+2+3+4+5+6+7+8+9+(5×4)+(2.5+2.5)+1
+                //    msg = msg.Substring(msg.IndexOf('='));
+                //}
+                //else
+                //{
+                //    goto Retry;
+                //}
                 goto Retry;
             }
             else if (msg.Contains('-') && !msg.Contains('='))
@@ -204,6 +208,14 @@ public static class IsCounting
                 chars.RemoveAll(c => c == (char)65039);
                 chars.RemoveAll(c => c == (char)8419);
                 chars.RemoveAll(c => c == ' ');
+                for (var i = 0; i < chars.Count; i++)
+                {
+                    if (chars[i] == "🇴"[0])
+                    {
+                        chars[i] = '0';
+                    }
+                }
+                chars.RemoveAll(c => c == (char)56820);
                 msg = string.Concat(chars);
                 goto Retry;
             }
@@ -221,7 +233,7 @@ public static class IsCounting
                 msg = msg[(msg.Length - number.ToString().Length)..];
                 goto Retry;
             }
-            else if (msg.Length > number.ToString().Length && (char.IsDigit(msg[0]) && char.IsDigit(msg[1])))
+            else if (msg.StartsWith((number + 1).ToString()))
             {
                 //Try trim?
                 msg = msg[..number.ToString().Length];
@@ -231,6 +243,12 @@ public static class IsCounting
             {
                 //It's somewhere in the middle..
                 msg = (number + 1).ToString(); //Don't bother..
+                goto Retry;
+            }
+            else if (HasAllNumberScattered(msg, number + 1))
+            {
+                //It's scatter in the text
+                msg = (number + 1).ToString();
                 goto Retry;
             }
             else if (!string.IsNullOrWhiteSpace(input.Attachments))
@@ -256,4 +274,14 @@ public static class IsCounting
         return compare != -1 && (compare - 1 == number);
     }
 
+    private static bool HasAllNumberScattered(string msg, int v)
+    {
+        var txt = v.ToString();
+        foreach (var c in txt)
+        {
+            if (!msg.Contains(c))
+                return false;
+        }
+        return true;
+    }
 }
