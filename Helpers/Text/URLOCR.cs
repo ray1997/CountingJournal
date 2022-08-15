@@ -18,6 +18,8 @@ public static class URLOCR
 
     public static async Task<string> GetTexts(string url)
     {
+        if (!url.StartsWith("https"))
+            return "";
         if (cached is null)
             await Initialize();
 

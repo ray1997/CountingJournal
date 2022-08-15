@@ -7,9 +7,17 @@ using System.Threading.Tasks;
 namespace CountingJournal.Helpers.Text;
 public static class Roman 
 {
-    private static char[] romans => new char[] { 'I', 'V', 'X', 'C', 'D', 'M' };
+    private static char[] romans => new char[] { 'I', 'V', 'X', 'C', 'D', 'M', 'L' };
 
-    public static bool IsRoman(string input) => input.Any(i => romans.Contains(i));
+    public static bool IsRoman(string input)// => input.Any(i => romans.Contains(i));
+    {
+        foreach (char c in input)
+        {
+            if (!romans.Contains(c))
+                return false;
+        }
+        return true;
+    }
 
     public static int ToNumber(string msg)
     {

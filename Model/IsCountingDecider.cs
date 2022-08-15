@@ -26,11 +26,7 @@ public static class IsCounting
         int triedThaiText = -1;
         int triedThaiNum = -1;
 
-        if (input.Content == "2400 im done now")
-        {
-            System.Diagnostics.Debug.Write("E");
-        }
-
+        
         Retry:
         try
         {
@@ -50,15 +46,13 @@ public static class IsCounting
             if (TimeHelper.IsWithin(input.SendAt, 5, 6) &&
                 TimeHelper.IsAt(input.SendAt, 1, 35, 24) &&
                 input.Sender.UserName == "Rews_red" && input.Content == "4")
-            {
                 msg = 604.ToString();
-            }
             else if (TimeHelper.IsWithin(input.SendAt, 5, 25) &&
                 TimeHelper.IsAt(input.SendAt, 20, 43, 12) &&
                 input.Sender.UserName == "Rews_red" && input.Content == "3")
                 msg = 2773.ToString();
 
-            if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
+                if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
                 input.SendAt.Hour == 21 && input.SendAt.Minute == 11 &&
                 input.Sender.UserName == "Rews_red")
             {
@@ -113,8 +107,14 @@ public static class IsCounting
                 msg = MemeReference[msg].ToString();
                 goto Retry;
             }
-            else if (msg.Contains('=')) //Predetermine formula
+            else if (IllogicalFormula.IsAlright(msg, number + 1))
             {
+                msg = (number + 1).ToString();
+                goto Retry;
+            }
+            else if (BasicCalculation.IsBasicCalculation(msg)) //Predetermine formula
+            {
+                //Before calculate, check if it's already calculate
                 if (msg.EndsWith((number + 1).ToString()))
                 { //2×3×41=246
                     msg = msg.Substring(msg.LastIndexOf('=') + 1);
@@ -125,28 +125,17 @@ public static class IsCounting
                 }
                 else
                 {
-                    if (IllogicalFormula.IsAlright(msg, number + 1))
-                    {
-                        msg = (number + 1).ToString();
-                        goto Retry;
-                    }
-                    return false;
+                    msg = BasicCalculation.Calculate(msg);
+                    goto Retry;
                 }
                 goto Retry;
             }
-            else if (msg.Contains('-'))
+            else if (msg.Contains('-') && !msg.Contains('='))
             {
                 //2-3-6
                 var removal = msg.ToCharArray().ToList();
                 removal.RemoveAll(c => c == '-');
                 msg = string.Concat(removal);
-                goto Retry;
-            }
-            else if (msg.Contains('^') && !msg.StartsWith('^')) //Math power equation
-            {
-                var baseNumber = int.Parse(msg[..msg.IndexOf('^')]);
-                var power = int.Parse(msg[(msg.IndexOf('^') + 1)..]);
-                msg = Math.Pow(baseNumber, power).ToString();
                 goto Retry;
             }
             else if (RepeaterSymbol.HasRepeater(msg))
@@ -254,6 +243,8 @@ public static class IsCounting
                     if (string.IsNullOrEmpty(msg))
                     {
                         msg = await URLOCR.GetTexts(input.Attachments);
+                        if (string.IsNullOrEmpty(msg))
+                            throw new Exception($"The image: {input.Attachments} isn't indexed yet");
                         goto Retry;
                     }
                     return false;

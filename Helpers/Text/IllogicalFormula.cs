@@ -9,14 +9,33 @@ public static class IllogicalFormula
 {
     public static bool IsAlright(string formula, int expectNumber)
     {
-        List<NumberOnFormula> expand = 
-            new(expectNumber.ToString().ToCharArray().Select(i => new NumberOnFormula() { number = i }));
-        foreach (var num in expand)
+        if (formula.Length <= expectNumber.ToString().Length)
+            return false;
+        if (Roman.IsRoman(formula))
+            return false;
+        if (formula.Any())
+        if (!formula.Any(c => BasicCalculation.symbols.Contains(c)))
+            return false;
+        try
         {
-            num.isInFormula = formula.Contains(num.number);
-            formula = formula[formula.IndexOf(num.number)..];
+            int latestFound = 0;
+            List<NumberOnFormula> expand =
+                new(expectNumber.ToString().ToCharArray().Select(i => new NumberOnFormula() { number = i }));
+            foreach (var num in expand)
+            {
+                num.isInFormula = formula.Contains(num.number);
+                latestFound = formula.IndexOf(num.number, latestFound);
+            }
+            var results = expand.Select(i => i.isInFormula).Distinct();
+            if (results.Count() > 1)
+                return false;
+            return results.First();
         }
-        return expand.Select(i => i.isInFormula).Distinct().First();
+        catch
+        {
+
+        }
+        return false;
     }
 
     private class NumberOnFormula
