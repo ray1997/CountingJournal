@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CountingJournal.Model;
 
 namespace CountingJournal.Helpers;
 public static class TimeHelper
 {
+
     public const string TimeFormat = "HH:mm:ss";
     public static bool Between(DateTime input, string min, string max)
     {
@@ -45,4 +47,13 @@ public static class TimeHelper
 
     public static bool IsAt(DateTime input, int hour, int minute, int second) 
         => input.Hour == hour && input.Minute == minute && input.Second == second;
+}
+
+public static class TimeHelperExtensions
+{
+    public static bool SendBetween(this Message message, string min, string max) => TimeHelper.Between(message.SendAt, min, max);
+
+    public static bool SendOn(this Message message, int month, int day) => TimeHelper.IsWithin(message.SendAt, month, day);
+
+    public static bool SendOn(this Message message, int hour, int minute, int second) => TimeHelper.IsAt(message.SendAt, hour, minute, second);
 }

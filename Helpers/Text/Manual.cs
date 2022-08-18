@@ -5,95 +5,67 @@ using System.Text;
 using System.Threading.Tasks;
 using CountingJournal.Model;
 using static CountingJournal.Helpers.TimeHelper;
+using CountingJournal.Helpers;
 
 namespace CountingJournal.Helpers.Text;
 public static class Manual
 {
     public static bool IsNoise(Message input)
-    {        
-        if (input.SendAt.Day == 2 && input.SendAt.Month == 5
-            && input.SendAt.Hour == 19 && (input.SendAt.Minute > 41 && input.SendAt.Minute < 45))
-        {
-            //Not in the incident 
-            //"437618453155938317","tacktor#9598","02-May-22 07:42 PM","273","",""
-            //"267230094395703297","Rews_red#9505","02-May-22 07:42 PM","","https://cdn.discordapp.com/attachments/969212093213573140/970666625080655933/images_-_2022-05-02T194138.929.jpeg",""
-            if (input.Content == "273" && input.Sender.UserName == "tacktor")
-                return false;
-            else if (string.IsNullOrWhiteSpace(input.Content) && !string.IsNullOrEmpty(input.Attachments))
-                return false;
-            /*
-             * "437618453155938317","tacktor#9598","02-May-22 07:42 PM","245","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:43 PM","246","",""
-             * "437618453155938317","tacktor#9598","02-May-22 07:43 PM","247","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:44 PM","248","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:44 PM","Wiat","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:44 PM","Wait","",""
-             * 437618453155938317","tacktor#9598","02-May-22 07:44 PM","Yes?","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:44 PM","Didn't we started at 274","",""
-             * "267230094395703297","Rews_red#9505","02-May-22 07:44 PM","💀","",""
-             * "437618453155938317","tacktor#9598","02-May-22 07:45 PM","Welp","","" 
-             */
-            //Long miscount incident #1 273 > 243-248
+    {
+        if (input.IsItFiller().Item1)
             return true;
-        }
-        else if (TimeHelper.IsWithin(input.SendAt, 5, 1) &&
-            TimeHelper.Between(input.SendAt, "14:45:00", "14:49:00"))
+
+        if (input.SendOn(5, 1) && input.SendBetween("14:45:00", "14:49:00"))
         {
             //Pro gamer move incident
-            /*
-             * "250308103105413121","Toon#9209","01-May-22 02:29:30 PM","189","","" //Keep
-             * "267230094395703297","Rews_red#9505","01-May-22 02:46:53 PM","where tf is 184 then","","" 
+            /* "267230094395703297","Rews_red#9505","01-May-22 02:46:53 PM","where tf is 184 then","",""
              * "437618453155938317","tacktor#9598","01-May-22 02:47:49 PM","Pro gamer move","",""
              * "267230094395703297","Rews_red#9505","01-May-22 02:47:53 PM","..?","",""
              * "437618453155938317","tacktor#9598","01-May-22 02:47:55 PM","190","","" //Keep
              * "437618453155938317","tacktor#9598","01-May-22 02:48:09 PM","Check again","",""
-             * Keep v
-             * "267230094395703297","Rews_red#9505","01-May-22 02:48:26 PM","","https://cdn.discordapp.com/attachments/969212093213573140/970230203945222174/unknown.png","" 
+             * "267230094395703297","Rews_red#9505","01-May-22 02:48:26 PM","","https://cdn.discordapp.com/attachments/969212093213573140/970230203945222174/unknown.png","" //Keep
              * "267230094395703297","Rews_red#9505","01-May-22 02:48:34 PM","edited bruh","",""
              * "437618453155938317","tacktor#9598","01-May-22 02:48:51 PM","I know","",""
-             * "526792117385953312","Kojina#1082","01-May-22 03:42:55 PM","192","","" //Keep
-             */
+             * "526792117385953312","Kojina#1082","01-May-22 03:42:55 PM","192","","" //Keep */
             if (input.Content == "190")
                 return false;
             if (input.Attachments == "https://cdn.discordapp.com/attachments/969212093213573140/970230203945222174/unknown.png")
                 return false;
-
             return true;
         }
-        else if (input.SendAt.Day == 4 && input.SendAt.Month == 5 &&
-            input.SendAt.Hour == 1 && input.SendAt.Minute == 2 &&
-            input.Sender.UserName == "Rews_red")
+        else if (input.SendOn(5, 2) && input.SendBetween("19:42:40","19:45:03"))
+        {
+            /* "437618453155938317","tacktor#9598","02-May-22 07:42:50 PM","245","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:43:36 PM","246","",""
+             * "437618453155938317","tacktor#9598","02-May-22 07:43:44 PM","247","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:44:14 PM","248","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:44:19 PM","Wiat","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:44:22 PM","Wait","",""
+             * "437618453155938317","tacktor#9598","02-May-22 07:44:30 PM","Yes?","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:44:35 PM","Didn't we started at 274","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:44:38 PM","💀","",""
+             * "437618453155938317","tacktor#9598","02-May-22 07:45:00 PM","Welp","",""
+             * "437618453155938317","tacktor#9598","02-May-22 07:45:05 PM","275","",""
+             * "267230094395703297","Rews_red#9505","02-May-22 07:45:10 PM","276","","" */
+            //Long miscount incident #1 273 > 243-248
+            return true;
+        }
+        else if (input.SendOn(5, 4) && input.SendBetween("01:02:00", "01:02:30"))
         {
             //Serveral mistake send
-            /*
-             * "267230094395703297","Rews_red#9505","04-May-22 01:02 AM","","https://cdn.discordapp.com/attachments/969212093213573140/971109438939340861/unknown.png",""
-             * "267230094395703297","Rews_red#9505","04-May-22 01:02 AM","(4x100)","",""
-             * "267230094395703297","Rews_red#9505","04-May-22 01:02 AM","401","",""
-             * "267230094395703297","Rews_red#9505","04-May-22 01:02 AM","wait","",""
-             * "267230094395703297","Rews_red#9505","04-May-22 01:02 AM","you say 401 is correcy","",""
+            /* "807952989623943189","BackScrasher#4282","04-May-22 01:01:39 AM","399","","" //Keep
+             * "267230094395703297","Rews_red#9505","04-May-22 01:01:46 AM","4️⃣ 🇴 🅾️","","" //Keep
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:12 AM","","https://cdn.discordapp.com/attachments/969212093213573140/971109438939340861/unknown.png",""
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:15 AM","(4x100)","",""
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:18 AM","401","",""
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:28 AM","wait","",""
+             * "807952989623943189","BackScrasher#4282","04-May-22 01:02:34 AM","401 Unauthorized","","" //Keep
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:35 AM","you say 401 is correcy","",""
+             * "267230094395703297","Rews_red#9505","04-May-22 01:02:37 AM","402","","" //Keep
              */
-            //Except this
-            if (input.Content == "402")
-                return false;
-
             return true;
         }
-        //A series of split message counting:
-        else if (IsWithin(input.SendAt, 5, 6) &&
-            input.SendAt.Hour == 1 && input.SendAt.Minute == 35 &&
-            input.Sender.UserName == "Rews_red" && input.Content == "60")
-        {
-            //Disallow this message, allow next one:
-            return true;
-            /*
-             * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
-             * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
-             * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","4","","" //Count this as 604
-             * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","605","",""
-             */
-        }
-        else if (IsWithin(input.SendAt, 5, 6) &&
-            Between(input.SendAt, "02:03:55", "02:06:10"))
+        else if (input.SendOn(5, 6) && input.SendBetween("02:03:55", "02:06:10"))
         {
             //Little intermission before continue on 1001
             /*
@@ -114,8 +86,7 @@ public static class Manual
              */
             return true;
         }
-        else if (IsWithin(input.SendAt, 5, 6) &&
-            Between(input.SendAt, "02:17:28", "02:18:30"))
+        else if (input.SendOn( 5, 6) && input.SendBetween("02:17:28", "02:18:30"))
         {
             /*
              * "437618453155938317","tacktor#9598","06-May-22 02:17:18 AM","1038","","" //Keep
@@ -130,8 +101,7 @@ public static class Manual
              */
             return true;
         }
-        if (IsWithin(input.SendAt, 5, 8) &&
-            Between(input.SendAt, "22:52:56", "22:54:50"))
+        if (input.SendOn(5, 8) && input.SendBetween("22:52:56", "22:54:50"))
         {
             //The 1350 incident
             /*
@@ -177,8 +147,7 @@ public static class Manual
             }
             return true;
         }
-        else if (IsWithin(input.SendAt, 5, 9) &&
-            Between(input.SendAt, "00:32:38", "00:35:10"))
+        else if (input.SendOn(5, 9) && input.SendBetween("00:32:38", "00:35:10"))
         {
             //The curious case of war joke
             /*
@@ -208,8 +177,7 @@ public static class Manual
             }
             return true;
         }
-        else if (IsWithin(input.SendAt, 5, 9) &&
-            Between(input.SendAt, "00:38:00", "02:30:00"))
+        else if (input.SendOn(5, 9) && input.SendBetween("00:38:00", "02:30:00"))
         {
             if (string.IsNullOrWhiteSpace(input.Content) && !string.IsNullOrWhiteSpace(input.Attachments))
                 return false;
@@ -238,7 +206,6 @@ public static class Manual
                 return false;
             else if (input.Content == "1927" && IsAt(input.SendAt, 1, 30, 40))
                 return false;
-
             //Missed someone birthday and long history:
             /*
              * "267230094395703297","Rews_red#9505","09-May-22 12:37:20 AM","","https://cdn.discordapp.com/attachments/969212093213573140/972915118302187520/unknown.png",""
@@ -293,8 +260,7 @@ public static class Manual
              * */
             return true;
         }
-        else if (IsWithin(input.SendAt, 5, 20) &&
-            Between(input.SendAt, "21:17:00", "21:19:48"))
+        else if (input.SendOn(5, 20) && input.SendBetween("21:17:00", "21:19:48"))
         {
             //A fillers
             /*
@@ -308,8 +274,7 @@ public static class Manual
              * "437618453155938317","tacktor#9598","20-May-22 09:19:57 PM","2589","",""
              */
         }
-        else if (IsWithin(input.SendAt, 6, 16) &&
-            Between(input.SendAt, "21:00:00", "23:40:00"))
+        else if (input.SendOn(6, 16) && input.SendBetween("21:00:00", "23:40:00"))
         {
             return true;
             /*
@@ -344,7 +309,7 @@ public static class Manual
              * "267230094395703297","Rews_red#9505","16-Jun-22 11:32:12 PM","it;s supposed to be 3k","",""
              * "371567557989105664","Ranvie#5623","16-Jun-22 11:43:20 PM","3327","","" */
         }
-        else if (IsWithin(input.SendAt, 6, 17) && Between(input.SendAt, "12:06:59", "12:07:45"))
+        else if (input.SendOn(6, 17) && input.SendBetween("12:06:59", "12:07:45"))
         {
             return true;
             /* "267230094395703297","Rews_red#9505","17-Jun-22 12:06:07 PM","3474","",""
@@ -355,7 +320,45 @@ public static class Manual
              * "267230094395703297","Rews_red#9505","17-Jun-22 12:07:48 PM","3476","",""
              * "873840836796903464","arizona ranger#9706","17-Jun-22 12:07:55 PM","3477","","" */
         }
+        else if (input.SendOn(6, 24) && input.SendBetween("12:55:00", "20:38:30"))
+        {
+            /* "250308103105413121","Toon#9209","24-Jun-22 10:45:27 AM","3624","","" //Keep
+             * "267230094395703297","Rews_red#9505","24-Jun-22 12:55:02 PM","3265","",""
+             * "250308103105413121","Toon#9209","24-Jun-22 12:56:34 PM","3266","",""
+             * "743040512365166634","marisa#9299","24-Jun-22 01:11:16 PM","3267","",""
+             * "480350715735441409","Joe Mama#0568","24-Jun-22 01:22:19 PM","3268 -do it. I done this.","",""
+             * "250308103105413121","Toon#9209","24-Jun-22 02:51:58 PM","","https://cdn.discordapp.com/attachments/969212093213573140/989800036676296745/unknown.png",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 03:05:38 PM","I should be banned from #นับถึงหมื่นด้วยกัน","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 03:05:53 PM","3625","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 03:09:30 PM","Im the one who made all the mistake","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 03:10:14 PM","https://c.tenor.com/3sscVvNm9zkAAAAM/controlmypc-cat.gif","",""
+             * "786401021110910986","Win#7206","24-Jun-22 08:17:30 PM","you piece of shit","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 08:26:03 PM","YOU DIDNT EVEN COUNT","",""
+             * "526792117385953312","Kojina#1082","24-Jun-22 08:36:58 PM","3270","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 08:38:26 PM","NO","",""
+             * "267230094395703297","Rews_red#9505","24-Jun-22 08:38:52 PM","3 6 2 5","","" //Keep 
+             * "526792117385953312","Kojina#1082","24-Jun-22 08:44:30 PM","fuck","",""
+             * "526792117385953312","Kojina#1082","24-Jun-22 08:44:35 PM","3626","","" //Keep */
+            return true;
+        }
+        else if (input.SendOn(7,8) && input.SendBetween("21:08:30", "21:26:30"))
+        {
+            return true;
+            //Someone's in a hurry!
+            /* "267230094395703297","Rews_red#9505","08-Jul-22 05:35:28 PM","3809","",""
+             * "575695984298950666","Ani_#9670","08-Jul-22 09:08:26 PM","3810","",""
+             * "575695984298950666","Ani_#9670","08-Jul-22 09:08:34 PM","3811","",""
+             * "575695984298950666","Ani_#9670","08-Jul-22 09:08:43 PM","3812","",""
+             * "267230094395703297","Rews_red#9505","08-Jul-22 09:25:54 PM","No","",""
+             * "267230094395703297","Rews_red#9505","08-Jul-22 09:25:58 PM","It doesn't work like thaf","",""
+             * "267230094395703297","Rews_red#9505","08-Jul-22 09:26:21 PM","No","",""
+             * "267230094395703297","Rews_red#9505","08-Jul-22 09:26:34 PM","3811","",""
+             * "250308103105413121","Toon#9209","08-Jul-22 10:03:43 PM","3812","",""
+             * "371567557989105664","Ranvie#5623","08-Jul-22 10:27:58 PM","3813","",""
+             */
+        }
 
+        //Fuck this emote
         else if (input.Content.Contains(":volatile_motes:"))
             return true;
 
@@ -369,6 +372,7 @@ public static class Manual
             case "https://cdn.discordapp.com/attachments/969212093213573140/984099216689336390/unknown.png":
             case "https://cdn.discordapp.com/attachments/969212093213573140/994048688643121234/unknown.png":
             case "https://cdn.discordapp.com/attachments/969212093213573140/994525961548738610/Screenshot_20220707-155038_Discord.jpg":
+            case "https://cdn.discordapp.com/attachments/969212093213573140/996409216799609003/unknown.png":
                 return true;
         }
         switch (input.Content)
@@ -483,6 +487,13 @@ public static class Manual
             case "bruh":
             case "time to countdown":
             case "3️⃣7️⃣:ninebutton:3️⃣:BlueDot:5️⃣":
+            case "have one zero in front":
+            case "0k":
+            case "because 10000 is the limit we'd do":
+            case "righttttt":
+            case "I've been waiting for this":
+            case "you say 401 is correcy":
+            case "fuck":
                 return true;
             case "60":/* * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
                        * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
@@ -546,6 +557,11 @@ public static class Manual
             case "1๘๕":
             case "1020":
                 if (input.Sender.UserName == "tacktor")
+                    return true;
+                return false;
+            case "3811":
+            case "3812":
+                if (input.Sender.UserName == "Ani_")
                     return true;
                 return false;
             case "3752":
@@ -649,6 +665,7 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/985221645956435988/unknown.png", 3070 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/985460203640205342/unknown.png", 3080 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/985598085579280504/unknown.png", 3090 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/989800036676296745/unknown.png", 3269 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/987215516299067455/1-33-33-time.jpg", 3333 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/987217522669543454/images.jpeg", 3390 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/987219212894343218/images_1.jpeg", 3434 },
@@ -657,6 +674,7 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/992076948123689050/E448F13F-4977-44F6-9041-9DB6E1A71F97.mp4", 3696 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/992087506638098524/unknown.png", 3701 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/992327642525204500/unknown.png", 3709 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/996420035922907167/unknown.png", 4000 },
     };
 
     public static Dictionary<string, int> MemeReference => new()
@@ -768,6 +786,12 @@ public static class Manual
         { "346Z", 3462 },
         { "364I", 3641 },
         { "Ǝ642", 3642 },
+        { "3760\n-5", 3755 },
         /*{ ":ThaksinThumbsUp: :ThaiChanHi: :ThaiChan: :ThaiSus1:", 3796 },*/
+        { "386∅", 3860 },
+        { "•39•7", 3907 },
+        { "0️⃣ 3️⃣ :ninebutton: 0️⃣ :eight_button:", 3908 },
+        { "3941.99999999999999999 ¯\\_(ツ)_/¯", 3942 },
+        { "https://discord.com/channels/959666934281015296/969212093213573140/969223431843364884 https://discord.com/channels/959666934281015296/969212093213573140/969216436306337833", 4032 },
     };
 }

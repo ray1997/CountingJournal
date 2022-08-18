@@ -43,22 +43,17 @@ public static class IsCounting
             }
 
             //Split count info
-            if (TimeHelper.IsWithin(input.SendAt, 5, 6) &&
-                TimeHelper.IsAt(input.SendAt, 1, 35, 24) &&
-                input.Sender.UserName == "Rews_red" && input.Content == "4")
-                msg = 604.ToString();
-            else if (TimeHelper.IsWithin(input.SendAt, 5, 25) &&
-                TimeHelper.IsAt(input.SendAt, 20, 43, 12) &&
-                input.Sender.UserName == "Rews_red" && input.Content == "3")
-                msg = 2773.ToString();
-            else if (TimeHelper.IsWithin(input.SendAt, 7, 4) && TimeHelper.IsAt(input.SendAt, 12, 2, 42) &&
-                input.Content == "+1" && input.Sender.UserName == "Rews_red")
-                msg = 3753.ToString();
-            else if (TimeHelper.IsWithin(input.SendAt, 7, 4) && TimeHelper.IsAt(input.SendAt, 12, 19, 15) &&
-                input.Content == "+2" && input.Sender.UserName == "tacktor")
-                msg = 3754.ToString();
+            var fillerInfo = input.IsItFiller();
+            if (!fillerInfo.Item1)
+            {
+                if (fillerInfo.Item2 != -1)
+                {
+                    msg = fillerInfo.Item2.ToString();
+                    goto NeverHappen;
+                }
+            }
 
-                if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
+            if (TimeHelper.IsWithin(input.SendAt, 5, 8) &&
                 input.SendAt.Hour == 21 && input.SendAt.Minute == 11 &&
                 input.Sender.UserName == "Rews_red")
             {
@@ -105,13 +100,18 @@ public static class IsCounting
             compare = int.Parse(msg);
             if (compare > number + 1 || compare < number)
             {
+#if DEBUG
+                bool debug = false;
+                if (debug)
+                    return false;
+#endif
                 throw new FormatException();
             }
         }
         catch
         {
             System.Diagnostics.Debug.WriteLine($"Currently stuck on {msg} ({input.Content}");
-
+            
             if (MemeReference.ContainsKey(msg))
             {
                 msg = MemeReference[msg].ToString();
@@ -125,19 +125,6 @@ public static class IsCounting
             else if (BasicCalculation.IsBasicCalculation(msg)) //Predetermine formula
             {
                 msg = BasicCalculation.Calculate(msg, (number + 1).ToString());
-                //Before calculate, check if it's already calculate
-                //if (msg.EndsWith((number + 1).ToString()))
-                //{ //2×3×41=246
-                //    msg = msg.Substring(msg.LastIndexOf('=') + 1);
-                //}
-                //else if (msg.StartsWith((number + 1).ToString()))
-                //{ //250=(10×10+5×5)+(1+2+3+4+5+6+7+8+9+(5×4)+(2.5+2.5)+1
-                //    msg = msg.Substring(msg.IndexOf('='));
-                //}
-                //else
-                //{
-                //    goto Retry;
-                //}
                 goto Retry;
             }
             else if (msg.Contains('-') && !msg.Contains('='))
@@ -205,56 +192,6 @@ public static class IsCounting
             else if (Markdown.HasMarkdown(msg))
             {
                 msg = Markdown.ToText(msg);
-                goto Retry;
-            }
-            else if (msg.Contains((char)65039) && msg.Contains((char)8419))
-            {
-                //Regional emoji number
-                var chars = msg.ToCharArray().ToList();
-                chars.RemoveAll(c => c == (char)65039);
-                chars.RemoveAll(c => c == (char)8419);
-                chars.RemoveAll(c => c == ' ');
-                for (var i = 0; i < chars.Count; i++)
-                {
-                    if (chars[i] == "🇴"[0])
-                    {
-                        chars[i] = '0';
-                    }
-                }
-                chars.RemoveAll(c => c == (char)56820);
-                msg = string.Concat(chars);
-                goto Retry;
-            }
-            else if (msg.Contains(' ')) //Space removal
-            {
-                var msgList = msg.ToList();
-                msgList.RemoveAll(c => c == ' ');
-                msg = string.Concat(msgList);
-                goto Retry;
-            }
-            //End with or start with number:
-            else if (msg.EndsWith((number + 1).ToString()))
-            {
-                //trim
-                msg = msg[(msg.Length - number.ToString().Length)..];
-                goto Retry;
-            }
-            else if (msg.StartsWith((number + 1).ToString()))
-            {
-                //Try trim?
-                msg = msg[..number.ToString().Length];
-                goto Retry;
-            }
-            else if (msg.Contains((number + 1).ToString()))
-            {
-                //It's somewhere in the middle..
-                msg = (number + 1).ToString(); //Don't bother..
-                goto Retry;
-            }
-            else if (HasAllNumberScattered(msg, number + 1))
-            {
-                //It's scatter in the text
-                msg = (number + 1).ToString();
                 goto Retry;
             }
             else if (!string.IsNullOrWhiteSpace(input.Attachments))
