@@ -11,17 +11,16 @@
 
     <Grid x:Name="ContentArea">
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Grid.Row="0"
-            x:Uid="Home_Title" Margin="12,0"
-            Style="{StaticResource PageTitleStyle}" />
         <Button Content="&#xE1A5;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center"
-                Margin="12,0" Command="{x:Bind ViewModel.GetCSVFileCommand}"
-                Visibility="{x:Bind ViewModel.ShowCSVGather, Mode=OneWay}"/>
+                Margin="12,0" Command="{x:Bind ViewModel.GetCSVFileCommand}" Visibility="Collapsed">
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Modifiers="Control" Key="A"/>
+            </Button.KeyboardAccelerators>
+        </Button>
 
         <Grid Grid.Row="1">
             <Grid.Resources>
@@ -45,7 +44,8 @@
                                        WithPics="{StaticResource withPicView}"/>
             </Grid.Resources>
             <ListView ItemsSource="{x:Bind ViewModel.CountingMessages, Mode=TwoWay}"
-                      ItemTemplateSelector="{StaticResource messageView}">
+                      ItemTemplateSelector="{StaticResource messageView}" MaxHeight="150"
+                      HorizontalAlignment="Left" MaxWidth="150">
                 <ListView.Header>
                     <StackPanel Orientation="Horizontal">
                         <Button Command="{x:Bind ViewModel.ListingMessagesCommand}"

@@ -80,12 +80,15 @@ public partial class HomeViewModel : ObservableRecipient
                 else if (LatestCountNumber == 2084) //Another missing number by Rews_red#9505
                     LatestCountNumber++;
                 else if (LatestCountNumber == 2787) //Another missing number by Rews_red#9505
-                    latestCountNumber++;
-                if (!CountingMessages.Contains(msg))
-                {
-                    CountingMessages.Insert(0, msg);
-                    continue;
-                }
+                    LatestCountNumber++;
+                else if (LatestCountNumber == 4953) //Another missing number by Rews_red#9505
+                    LatestCountNumber++;
+                CountingMessages.Add(new Message() { Attachments = msg.Attachments, Content = LatestCountNumber.ToString(), SendAt = msg.SendAt, Sender = msg.Sender });
+                //if (!CountingMessages.Contains(msg))
+                //{
+                //    CountingMessages.Insert(0, msg);
+                //    continue;
+                //}
             }
             else
             {
@@ -100,6 +103,8 @@ public partial class HomeViewModel : ObservableRecipient
                 break;
             }
         }
+        //Save to new CSV
+        
     }
 
     public Visibility ShowCSVGather

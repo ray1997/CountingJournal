@@ -52,6 +52,25 @@ public static class Splits
         else if (input.SendOn(7, 4) && input.SendOn(12, 19, 15))
             return (false, 3754);
 
-        return (false, -1);
+        /* "267230094395703297","Rews_red#9505","20-Jul-22 10:16:09 PM","4406","",""
+         * "267230094395703297","Rews_red#9505","20-Jul-22 10:16:11 PM","-1","",""
+         * "267230094395703297","Rews_red#9505","20-Jul-22 10:16:18 PM","=4405","",""*/
+        else if (input.SendOn(7, 20) && input.SendOn(22, 16, 9))
+            return (true, -1);
+        else if (input.SendOn(7, 20) && input.SendOn(22, 16, 11))
+            return (true, -1);
+        else if (input.SendOn(7, 20) && input.SendOn(22, 16, 18))
+            return (false, 4405);
+
+        /* "267230094395703297","Rews_red#9505","09-Aug-22 01:00:05 PM","3953","",""
+         * "267230094395703297","Rews_red#9505","09-Aug-22 01:00:14 PM","+1000","",""
+         * "267230094395703297","Rews_red#9505","09-Aug-22 01:00:21 PM","=4953","","" */
+        else if (input.SendOn(8, 9) && input.SendOn(13, 0, 5))
+            return (true, -1);
+        else if (input.SendOn(8, 9) && input.SendOn(13, 0, 14))
+            return (true, -1);
+        else if (input.SendOn(8, 9) && input.SendOn(13, 0, 21))
+            return (false, 4953);
+        return (false, -1);        
     }
 }

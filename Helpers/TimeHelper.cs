@@ -47,6 +47,9 @@ public static class TimeHelper
 
     public static bool IsAt(DateTime input, int hour, int minute, int second) 
         => input.Hour == hour && input.Minute == minute && input.Second == second;
+
+    public static bool IsWithin(DateTime input, DateTime min, DateTime max)
+        => input > min && input < max;
 }
 
 public static class TimeHelperExtensions
@@ -56,4 +59,7 @@ public static class TimeHelperExtensions
     public static bool SendOn(this Message message, int month, int day) => TimeHelper.IsWithin(message.SendAt, month, day);
 
     public static bool SendOn(this Message message, int hour, int minute, int second) => TimeHelper.IsAt(message.SendAt, hour, minute, second);
+
+    public static bool SendWithin(this Message message, DateTime min, DateTime max)
+        => TimeHelper.IsWithin(message.SendAt, min, max);
 }

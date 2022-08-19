@@ -33,7 +33,7 @@ public static class Manual
                 return false;
             return true;
         }
-        else if (input.SendOn(5, 2) && input.SendBetween("19:42:40","19:45:03"))
+        else if (input.SendOn(5, 2) && input.SendBetween("19:42:40", "19:45:03"))
         {
             /* "437618453155938317","tacktor#9598","02-May-22 07:42:50 PM","245","",""
              * "267230094395703297","Rews_red#9505","02-May-22 07:43:36 PM","246","",""
@@ -86,7 +86,7 @@ public static class Manual
              */
             return true;
         }
-        else if (input.SendOn( 5, 6) && input.SendBetween("02:17:28", "02:18:30"))
+        else if (input.SendOn(5, 6) && input.SendBetween("02:17:28", "02:18:30"))
         {
             /*
              * "437618453155938317","tacktor#9598","06-May-22 02:17:18 AM","1038","","" //Keep
@@ -341,7 +341,7 @@ public static class Manual
              * "526792117385953312","Kojina#1082","24-Jun-22 08:44:35 PM","3626","","" //Keep */
             return true;
         }
-        else if (input.SendOn(7,8) && input.SendBetween("21:08:30", "21:26:30"))
+        else if (input.SendOn(7, 8) && input.SendBetween("21:08:30", "21:26:30"))
         {
             return true;
             //Someone's in a hurry!
@@ -356,6 +356,29 @@ public static class Manual
              * "250308103105413121","Toon#9209","08-Jul-22 10:03:43 PM","3812","",""
              * "371567557989105664","Ranvie#5623","08-Jul-22 10:27:58 PM","3813","",""
              */
+        }
+        else if (input.SendOn(7, 18) && input.SendBetween("00:54:50", "00:55:15"))
+        {
+            //Small mistakes
+            /* "743040512365166634","marisa#9299","18-Jul-22 12:54:34 AM","4337","","" //Keep
+             * "267230094395703297","Rews_red#9505","18-Jul-22 12:54:55 AM","4357?","",""
+             * "743040512365166634","marisa#9299","18-Jul-22 12:55:07 AM","lol cant count","",""
+             * "267230094395703297","Rews_red#9505","18-Jul-22 12:55:12 AM","Same","",""
+             * "267230094395703297","Rews_red#9505","18-Jul-22 12:55:20 AM","4338","","" //Keep */
+            return true;
+        }
+        else if (input.SendWithin(min: new DateTime(2022, 7, 19, 23, 31, 40),
+            max: new DateTime(2022, 7, 20, 12, 19, 0)))
+        {
+            //It's rewind time
+            /* "250308103105413121","Toon#9209","19-Jul-22 11:31:38 PM","4390","","" //Keep
+             * "267230094395703297","Rews_red#9505","19-Jul-22 11:31:45 PM","4931","",""
+             * .
+             * .
+             * "371567557989105664","Ranvie#5623","20-Jul-22 12:18:57 PM","It's rewind time","",""
+             * "371567557989105664","Ranvie#5623","20-Jul-22 12:19:39 PM","4391","","" //Keep
+             * "250308103105413121","Toon#9209","20-Jul-22 12:28:39 PM","4392","","" */
+            return true;
         }
 
         //Fuck this emote
@@ -494,6 +517,17 @@ public static class Manual
             case "I've been waiting for this":
             case "you say 401 is correcy":
             case "fuck":
+            case "what":
+            case "Did you get hacked or something":
+            case "ah":
+            case "I see":
+            case "Why am I always the one who fucjs it up":
+            case "is that your discord ping":
+            case "oh i cant count twice?":
+            case "yeah":
+            case "Quad fours!":
+            case "Too soon":
+            case "😳":
                 return true;
             case "60":/* * "807952989623943189","BackScrasher#4282","06-May-22 01:35 AM","603 access denied","",""
                        * * "267230094395703297","Rews_red#9505","06-May-22 01:35 AM","60","","" //Drop this
@@ -675,6 +709,9 @@ public static class Manual
         { "https://cdn.discordapp.com/attachments/969212093213573140/992087506638098524/unknown.png", 3701 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/992327642525204500/unknown.png", 3709 },
         { "https://cdn.discordapp.com/attachments/969212093213573140/996420035922907167/unknown.png", 4000 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/999233793602883604/images_4.jpeg", 4399 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/1001088488655032360/4468.jpeg", 4468 },
+        { "https://cdn.discordapp.com/attachments/969212093213573140/1001089141288747068/IMG_20220725_183027.jpg", 4470 },
     };
 
     public static Dictionary<string, int> MemeReference => new()
@@ -793,5 +830,8 @@ public static class Manual
         { "0️⃣ 3️⃣ :ninebutton: 0️⃣ :eight_button:", 3908 },
         { "3941.99999999999999999 ¯\\_(ツ)_/¯", 3942 },
         { "https://discord.com/channels/959666934281015296/969212093213573140/969223431843364884 https://discord.com/channels/959666934281015296/969212093213573140/969216436306337833", 4032 },
+        { "https://discord.com/channels/959666934281015296/969212093213573140/969223431843364884 \nhttps://discord.com/channels/959666934281015296/969212093213573140/969221537985101844", 4034 },
+        { "have fun going back up and go back down again. https://discord.com/channels/959666934281015296/969212093213573140/996409685999624262\n+\nhttps://discord.com/channels/959666934281015296/969212093213573140/969297064611708928", 4037 },
+        { "4️⃣ :eight_button: 0️⃣ ๐", 4800 },
     };
 }
