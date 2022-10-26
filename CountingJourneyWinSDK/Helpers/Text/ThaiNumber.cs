@@ -27,7 +27,7 @@ public static class ThaiNumber
         return msg.Any(i => THtoEN.ContainsKey(i));
     }
 
-    private static Dictionary<char, char> THtoEN => new()
+    public static Dictionary<char, char> THtoEN => new()
             {
                 { '๐', '0' },
                 { '๑', '1' },

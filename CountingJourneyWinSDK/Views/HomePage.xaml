@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:m="using:CountingJournal.Model"
+    xmlns:vm="using:CountingJournal.ViewModels"
     xmlns:local="using:CountingJournal.Views"
     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
     mc:Ignorable="d">
@@ -14,7 +15,56 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        <CommandBar HorizontalAlignment="Left" DefaultLabelPosition="Right">
+            <AppBarButton Command="{x:Bind ViewModel.ListingMessagesCommand}"
+                          Label="Load messages">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE149;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Command="{x:Bind ViewModel.CountingCommand}"
+                          Label="Count">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE0AB;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton IsHitTestVisible="False">
+                <AppBarButton.Content>
+                    <TextBlock>
+                        Final number: <Run Text="{x:Bind ViewModel.LatestCountNumber, Mode=OneWay}"/>
+                    </TextBlock>
+                </AppBarButton.Content>
+            </AppBarButton>
+            <AppBarButton IsHitTestVisible="False">
+                <AppBarButton.Content>
+                    <TextBlock>
+                        Total filler: <Run Text="{x:Bind ViewModel.TotalFiller, Mode=OneWay}"/>
+                    </TextBlock>
+                </AppBarButton.Content>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton Icon="View">
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <ToggleMenuFlyoutItem Text="Show filler" 
+                                              IsChecked="{x:Bind ViewModel.ShowFillers, Mode=TwoWay}"/>
+                        <ToggleMenuFlyoutItem Text="Show confirmed"
+                                              IsChecked="{x:Bind ViewModel.ShowConfirmed, Mode=TwoWay}"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarSeparator/>
+            <AppBarButton Command="{x:Bind ViewModel.SkipToNextFillerCommand}"
+                          Icon="Next"
+                          Label="Skip to next filler"/>
+            <AppBarButton Command="{x:Bind ViewModel.SkipToNextFillerNotCommand}"
+                          Icon="Next"
+                          Label="Skip to next confirmed number"/>
+            <AppBarButton Command="{x:Bind ViewModel.JumpToLatestConfirmedFillerCommand}"
+                          Icon="Next"
+                          Label="Jump to latest confirmed filler"/>
+        </CommandBar>
         <Button Content="&#xE1A5;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center"
                 Margin="12,0" Command="{x:Bind ViewModel.GetCSVFileCommand}" Visibility="Collapsed">
             <Button.KeyboardAccelerators>
@@ -24,19 +74,105 @@
 
         <Grid Grid.Row="1">
             <Grid.Resources>
-                <DataTemplate x:DataType="m:Message"
+                <DataTemplate x:DataType="vm:MessageViewModel"
                               x:Key="withPicView">
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock Text="{x:Bind Content}" IsTextSelectionEnabled="True"/>
-                        <TextBlock Text="{x:Bind Attachments}" FontSize="12" IsTextSelectionEnabled="True"/>
-                        <Image Source="{x:Bind Attachments}" Width="320" Height="240"
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="{x:Bind FillerIcon, Mode=OneWay}" VerticalAlignment="Center"
+                                  ToolTipService.ToolTip="{x:Bind FillerTooltip, Mode=OneWay}" Margin="0,0,5,0"
+                                  HorizontalAlignment="Center"
+                                  Visibility="{x:Bind ShowIfItIsFiller, Mode=OneWay}"
+                                  Foreground="{ThemeResource SystemAccentColor}"/>
+                        <StackPanel Orientation="Vertical" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <PersonPicture DisplayName="{x:Bind Sender.Name}" MaxHeight="32">
+                                    <ToolTipService.ToolTip>
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{x:Bind Sender.Name}"
+                                                   FontSize="18" FontWeight="Bold"/>
+                                            <TextBlock FontSize="12">
+                                            #<Run Text="{x:Bind Sender.Discriminator}"/> (<Run Text="{x:Bind Sender.UserID}"/>)
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </ToolTipService.ToolTip>
+                                </PersonPicture>
+                                <SymbolIcon Symbol="Clock" Margin="5,0" ToolTipService.ToolTip="{x:Bind SendAt}"/>
+                                <TextBlock Text="{x:Bind Content}"
+                                       VerticalAlignment="Center" 
+                                       IsTextSelectionEnabled="True"/>
+                                <TextBlock Text="{x:Bind Attachments}" 
+                                       VerticalAlignment="Center"
+                                       FontSize="12" IsTextSelectionEnabled="True"/>
+                            </StackPanel>
+                            <Image Source="{x:Bind Attachments}" Width="320" Height="240"
                                Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Column="2">
+                            <Button Command="{x:Bind ConfirmThisMessageAsFillerCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE109;"/>
+                                    <TextBlock Text="Confirmed filler"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{x:Bind RevertFillerConfirmationCommand}"
+                                    Margin="5,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE10E;"/>
+                                    <TextBlock Text="Revert filler confirm"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
-                <DataTemplate x:DataType="m:Message"
+                <DataTemplate x:DataType="vm:MessageViewModel"
                               x:Key="plainTextView">
                     <Grid>
-                        <TextBlock Text="{x:Bind Content}" IsTextSelectionEnabled="True"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="{x:Bind FillerIcon, Mode=OneWay}" VerticalAlignment="Center"
+                                  ToolTipService.ToolTip="{x:Bind FillerTooltip, Mode=OneWay}" Margin="0,0,5,0"
+                                  HorizontalAlignment="Center"
+                                  Visibility="{x:Bind ShowIfItIsFiller, Mode=OneWay}"
+                                  Foreground="{ThemeResource SystemAccentColor}"/>
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Column="1">
+                            <PersonPicture DisplayName="{x:Bind Sender.Name}" MaxHeight="32">
+                                <ToolTipService.ToolTip>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{x:Bind Sender.Name}"
+                                                   FontSize="18" FontWeight="Bold"/>
+                                        <TextBlock FontSize="12">
+                                            #<Run Text="{x:Bind Sender.Discriminator}"/> (<Run Text="{x:Bind Sender.UserID}"/>)
+                                        </TextBlock>
+                                    </StackPanel>
+                                </ToolTipService.ToolTip>
+                            </PersonPicture>
+                            <SymbolIcon Symbol="Clock" Margin="5,0" ToolTipService.ToolTip="{x:Bind SendAt}"/>
+                            <TextBlock Text="{x:Bind Content}" IsTextSelectionEnabled="True"
+                                   VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Column="2">
+                            <Button Command="{x:Bind ConfirmThisMessageAsFillerCommand}">
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE109;"/>
+                                    <TextBlock Text="Confirmed filler"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{x:Bind RevertFillerConfirmationCommand}"
+                                    Margin="5,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <FontIcon Glyph="&#xE10E;"/>
+                                    <TextBlock Text="Revert filler confirm"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
                 <local:MessageTemplate x:Key="messageView"
@@ -46,16 +182,8 @@
             <ListView ItemsSource="{x:Bind ViewModel.CountingMessages, Mode=TwoWay}"
                       ItemTemplateSelector="{StaticResource messageView}"
                       HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch">
-                <ListView.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Command="{x:Bind ViewModel.ListingMessagesCommand}"
-                                Content="&#xE149;" FontFamily="Segoe MDL2 Assets" FontSize="24"/>
-                        <Button Command="{x:Bind ViewModel.CountingCommand}" Margin="4,0"
-                                Content="&#xE0AB;" FontFamily="Segoe MDL2 Assets" FontSize="24"/>
-                        <TextBlock Text="{x:Bind ViewModel.LatestCountNumber, Mode=OneWay}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </ListView.Header>
+                      VerticalAlignment="Stretch"
+                      SelectedIndex="{x:Bind ViewModel.SelectedMessage, Mode=TwoWay, FallbackValue=-1}">
             </ListView>
         </Grid>
         

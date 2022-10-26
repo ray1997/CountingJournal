@@ -11,17 +11,31 @@ using WinRT;
 using static CountingJournal.MainWindow;
 using static CountingJournal.Helpers.Text.Manual;
 using SAP = Windows.Storage.AccessCache.StorageApplicationPermissions;
+using MSG = CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger;
+using CountingJournal.Model.Messages;
+using System.ComponentModel;
+using System.Text.Json;
+using System.Text;
 
 namespace CountingJournal.ViewModels;
 
 public partial class HomeViewModel : ObservableRecipient
 {
     [ObservableProperty]
-    private ObservableCollection<Message>? messages;
-
+    private ObservableCollection<MessageViewModel>? messages;
 
     [ObservableProperty]
-    private ObservableCollection<Message>? countingMessages;
+    private ObservableCollection<MessageViewModel>? countingMessages;
+
+
+    [RelayCommand]
+    private void JumpToLatestConfirmedFiller()
+    {
+        var lastConfirmed = CountingMessages.Last(msg => msg.ConfirmedFiller);
+        if (lastConfirmed is null)
+            return;
+        SelectedMessage = CountingMessages.IndexOf(lastConfirmed);
+    }
 
     [ObservableProperty]
     StorageFile? cSVFile = null;
@@ -34,6 +48,62 @@ public partial class HomeViewModel : ObservableRecipient
     {
         appConfig = App.GetService<Settings>();
         OnPropertyChanged(nameof(ShowCSVGather));
+        MSG.Default.Register<HomeViewModel, ConfirmThisAsFillerMessage, string>(this, Token.ConfirmFillerMSGToken,
+            (home, fillerMSG) => AddOrRemoveConfirmedFillers(fillerMSG));
+        ConfirmedFillers = new();
+        //Load filler list
+        DirectoryInfo dir = new(@"D:\UserData\Desktop\Counting-20221026-1800\Fillers");
+        if (!dir.Exists)
+            dir.Create();
+        var files = dir.GetFiles();
+        foreach (var file in files)
+        {
+            var json = File.ReadAllText(file.FullName);
+            var deserialized = JsonSerializer.Deserialize<Message?>(json);
+            if (deserialized is null)
+            {
+                continue;
+            }
+            ConfirmedFillers.Add(deserialized);
+        }
+    }
+
+    [ObservableProperty]
+    ObservableCollection<Message> confirmedFillers = new();
+
+    private void AddOrRemoveConfirmedFillers(ConfirmThisAsFillerMessage fillerMSG)
+    {
+        if (fillerMSG.ConfirmAsFiller)
+        {
+            //Add to filler list
+            ConfirmedFillers.Add(fillerMSG.ConfirmFiller);
+            //Save to json
+            DirectoryInfo folder = new(@"D:\UserData\Desktop\Counting-20221026-1800\Fillers");
+            if (!folder.Exists)
+                folder.Create();
+            string fileName = $"{fillerMSG.ConfirmFiller.SendAt.Ticks}.json";
+            File.WriteAllTextAsync(Path.Join(folder.FullName, fileName), JsonSerializer.Serialize<Message>(fillerMSG.ConfirmFiller, 
+                new JsonSerializerOptions() 
+                { 
+                    WriteIndented = true 
+                }));
+        }
+        else
+        {
+            if (!ConfirmedFillers.Contains(fillerMSG.ConfirmFiller))
+            {
+                return;
+            }
+            ConfirmedFillers.Remove(fillerMSG.ConfirmFiller);
+            string fileName = $"{fillerMSG.ConfirmFiller.SendAt.Ticks}.json";
+            DirectoryInfo folder = new(@"D:\UserData\Desktop\Counting-20221026-1800\Fillers");
+            if (!folder.Exists)
+                return;
+            FileInfo savedFiller = new(Path.Join(folder.FullName, fileName));
+            if (!savedFiller.Exists)
+                return;
+            savedFiller.Delete();
+        }
     }
 
     [RelayCommand]
@@ -52,8 +122,8 @@ public partial class HomeViewModel : ObservableRecipient
         using var reader = new StreamReader(stream);
         using var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture);
         csv.Context.RegisterClassMap<MessageMapper>();
-        var items = csv.GetRecords<Message>();
-        Messages = new ObservableCollection<Message>(items);
+        var items = csv.GetRecords<Message>().Select(msg => new MessageViewModel(msg, ConfirmedFillers.Any(confirm => msg.SendAt.Ticks == confirm.SendAt.Ticks)));
+        Messages = new ObservableCollection<MessageViewModel>(items);
         //CountingMessages = new(Messages.Select(i => IsCounting.Decide(i)));
     }
 
@@ -64,47 +134,155 @@ public partial class HomeViewModel : ObservableRecipient
             CountingMessages = new();
         if (Messages is null)
             await ListingMessages();
+        else
+        {
+            Messages.Clear();
+            await ListingMessages();
+        }
         IsCounting.ResetLastSender();
         LatestCountNumber = 0;
+        CountingMessages.Clear();
+        MessageViewModel? previousAnchor = null;
+        int acceptableGapSize = 2;
         foreach (var msg in Messages)
         {
-            bool decide = await IsCounting.Decide(LatestCountNumber, msg);
-            if (decide)
+            if (msg.ConfirmedFiller)
+                continue;
+            var previous = string.Empty;
+            if (previousAnchor is null)
             {
-                System.Diagnostics.Debug.WriteLine($"Counting to number: {LatestCountNumber}");
-                LatestCountNumber++;
-                if (LatestCountNumber == 1980) //Missing number by Rews_red#9505
-                    LatestCountNumber++;
-                else if (LatestCountNumber == 2018) //Another missing number by Toon#9209
-                    LatestCountNumber++;
-                else if (LatestCountNumber == 2084) //Another missing number by Rews_red#9505
-                    LatestCountNumber++;
-                else if (LatestCountNumber == 2787) //Another missing number by Rews_red#9505
-                    LatestCountNumber++;
-                else if (LatestCountNumber == 4953) //Another missing number by Rews_red#9505
-                    LatestCountNumber++;
-                CountingMessages.Add(new Message() { Attachments = msg.Attachments, Content = LatestCountNumber.ToString(), SendAt = msg.SendAt, Sender = msg.Sender });
-                //if (!CountingMessages.Contains(msg))
-                //{
-                //    CountingMessages.Insert(0, msg);
-                //    continue;
-                //}
+                previous = "0";
             }
             else
             {
-                if (IsNoise(msg))
-                    continue;                
-                else if (string.IsNullOrWhiteSpace(msg.Content))
-                {
-                    CountingMessages.Insert(0, msg);
-                    break;
-                }
-                CountingMessages.Insert(0, msg);
-                break;
+                previous = previousAnchor.AsNumber > 0 ?
+                    previousAnchor.AsNumber.ToString() :
+                    previousAnchor.Content;
             }
+
+            var next = msg.Content;
+
+            bool shouldSwitchAnchor = false;
+
+            //Attempted flags
+            bool triedFilterOnlyNumber = false;
+            bool presumeAllNumberSpread = false;
+            bool triedConvertFromThaiNum = false;
+            bool triedYamokConvert = false;
+
+        retry:
+            shouldSwitchAnchor = IsCountingDeciderV2.ShouldAddIn(previous, next, acceptableGapSize);
+            if (shouldSwitchAnchor)
+            {
+                acceptableGapSize = 2;
+                msg.IsFiller = false;
+                msg.AsNumber = int.Parse(next);
+                previousAnchor = msg;
+                continue;
+            }
+            else
+                next = msg.Content;
+            //Is it contains text?
+            //2384 fillers: no changes
+            //1363 fillers: filter to number only
+            //911 fillers: presume mixed with other number
+            //1223 fillers: fix bug on presumeNumberSpread allow distinct one false pass through as number
+            //1146 fillers: convert thai number to arabic
+            //1128 fillers: convert repeater symbol to normal number
+            acceptableGapSize++;
+
+
+            if (!triedFilterOnlyNumber)
+            {
+                next = IsCountingDeciderV2.PerhapsTheNumberIsMixedWithText(msg);
+                triedFilterOnlyNumber = true;
+                goto retry;
+            }
+            if (!presumeAllNumberSpread)
+            {
+                string testing = IsCountingDeciderV2.PerhapsTheNumberIsMixedWithTextAndNumber(msg, previous);
+                next = !string.IsNullOrEmpty(testing) ? testing : msg.Content;
+                presumeAllNumberSpread = true;
+                goto retry;
+            }
+            if (!triedConvertFromThaiNum)
+            {
+                next = IsCountingDeciderV2.PerhapsThereIsThaiNumber(msg);
+                triedConvertFromThaiNum = true;
+                goto retry;
+            }
+            if (!triedYamokConvert)
+            {
+                next = RepeaterSymbol.Translate(next, int.Parse(previous) + 1);
+                triedYamokConvert = true;
+                goto retry;
+            }
+
+            //Finally give up
+            msg.ExpectNumber = int.Parse(previous) + 1;
+            msg.IsFiller = true;
         }
-        //Save to new CSV
-        
+        CountingMessages = new(Messages.Where(msg => Consider(msg)));
+        TotalFiller = Messages.Where(msg => msg.IsFiller).Count();
+    }
+
+    private bool Consider(MessageViewModel msg)
+    {
+        if (ShowFillers && msg.IsFiller)
+            return true;
+        else if (ShowConfirmed && !msg.IsFiller)
+            return true;
+        return false;
+    }
+
+    [ObservableProperty]
+    bool showFillers = true;
+
+    [ObservableProperty]
+    bool showConfirmed = true;
+
+    [ObservableProperty]
+    int totalFiller = -1;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMessageSelected))]
+    [NotifyCanExecuteChangedFor(nameof(SkipToNextFillerCommand))]
+    [NotifyCanExecuteChangedFor(nameof(SkipToNextFillerNotCommand))]
+    int selectedMessage = -1;
+
+    public bool IsMessageSelected
+        => SelectedMessage >= 0;
+
+    [RelayCommand(CanExecute = nameof(IsMessageSelected))]
+    private void SkipToNextFiller()
+    {
+        try
+        {
+            var next = SelectedMessage;
+            do
+            {
+                next++;
+            }
+            while (!CountingMessages[next].IsFiller);
+            SelectedMessage = next;
+        }
+        catch { }
+    }
+
+    [RelayCommand(CanExecute = nameof(IsMessageSelected))]
+    private void SkipToNextFillerNot()
+    {
+        try
+        {
+            var next = SelectedMessage;
+            do
+            {
+                next++;
+            }
+            while (CountingMessages[next].IsFiller);
+            SelectedMessage = next;
+        }
+        catch { }
     }
 
     public Visibility ShowCSVGather

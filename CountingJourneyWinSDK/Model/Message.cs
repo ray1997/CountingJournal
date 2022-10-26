@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CsvHelper;
@@ -12,9 +13,6 @@ using CsvHelper.TypeConversion;
 namespace CountingJournal.Model;
 public partial class Message : ObservableObject
 {
-    [ObservableProperty]
-    private long messageID;
-
     [ObservableProperty]
     private User? sender;
 
@@ -31,11 +29,43 @@ public partial class Message : ObservableObject
 public partial class User : ObservableObject
 {
     [ObservableProperty]
-    string? userName;
+    private long userID;
 
     [ObservableProperty]
-    int userDiscriminator;
+    [NotifyPropertyChangedFor(nameof(Name))]
+    [NotifyPropertyChangedFor(nameof(Discriminator))]
+    string userName = string.Empty;
 
+    [JsonIgnore]
+    public string Name
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(UserName) || !UserName.Contains('#'))
+            {
+                return string.Empty;
+            }
+
+            var span = UserName.AsSpan();
+            return new string(span[..^5]);
+        }
+    }
+
+    [JsonIgnore]
+    public int Discriminator
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(UserName) || !UserName.Contains('#'))
+            {
+                return -1;
+            }
+
+            var span = UserName.AsSpan();
+            var succeed = int.TryParse(span[^4..], out var result);
+            return succeed ? result : -1;
+        }
+    }
     public override bool Equals(object? obj)
     {
         if (obj is not User)
@@ -46,9 +76,14 @@ public partial class User : ObservableObject
 
         if (obj is User compare)
         {
-            if (this.UserName == compare.UserName
-                && this.UserDiscriminator == this.UserDiscriminator)
+            if (Name == compare.Name
+                && Discriminator == compare.Discriminator)
                 return true;
+            else
+            {
+                if (UserID == compare.UserID)
+                    return true;
+            }
         }
         return false;
     }
@@ -63,24 +98,11 @@ public class MessageMapper : ClassMap<Message>
 {
     public MessageMapper()
     {
-        Map(m => m.MessageID).Name("AuthorID");
-        Map(m => m.Sender).TypeConverter<UsernameConverter>().Name("Author");
+        Map(m => m.Sender.UserName).Name("Author");
+        Map(m => m.Sender.UserID).Name("AuthorID");
         Map(m => m.SendAt).TypeConverter<DateTimeConverter>().Name("Date");
         Map(m => m.Content).Name("Content");
         Map(m => m.Attachments).Name("Attachments");
-    }
-}
-
-public class UsernameConverter : DefaultTypeConverter
-{
-    public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
-    {
-        var user = text.AsSpan();
-        return new User()
-        {
-            UserName = user[..^5].ToString(),
-            UserDiscriminator = int.Parse(user[^4..])
-        };
     }
 }
 

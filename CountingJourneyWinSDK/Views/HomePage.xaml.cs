@@ -33,7 +33,9 @@ public class MessageTemplate : DataTemplateSelector
     }
     protected override DataTemplate SelectTemplateCore(object item)
     {
-        if (item is Message msg)
+        if (item is not Message || item is not MessageViewModel)
+            return base.SelectTemplate(item);
+        if (item is MessageViewModel msg)
         {
             if (!string.IsNullOrWhiteSpace(msg.Attachments))
                 return WithPics;
