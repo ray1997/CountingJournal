@@ -126,21 +126,11 @@ public partial class HomeViewModel : ObservableRecipient
             !string.IsNullOrWhiteSpace(appConfig.CSVID))
         {
             CSVFile = await SAP.FutureAccessList.GetFileAsync(appConfig.CSVID);
+            return;
         }
 
-        var picker = new FileOpenPicker()
-        {
-            SuggestedStartLocation = PickerLocationId.Desktop,
-            ViewMode = PickerViewMode.List
-        };
-        picker.FileTypeFilter.Add(".csv");
-        var result = await picker.PickSingleFileAsync();
-        if (result is StorageFile picked)
-        {
-            //CSVFile = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync("data.csv");
-            appConfig.CSVID = SAP.FutureAccessList.Add(picked);
-            CSVFile = picked;
-            OnPropertyChanged(nameof(ShowCSVGather));
-        }
+        StorageFile file = await StorageFile.GetFileFromPathAsync(@"D:\UserData\Desktop\Counting-20221026-1800\countTo10k.csv");
+        appConfig.CSVID = SAP.FutureAccessList.Add(file);
+        CSVFile = file;
     }
 }

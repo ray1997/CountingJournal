@@ -88,8 +88,9 @@ public class DateTimeConverter : DefaultTypeConverter
 {
     public override object ConvertFromString(string text, IReaderRow row, MemberMapData memberMapData)
     {
-        //28-Apr-22 07:25 PM
-        return DateTime.ParseExact(text, "dd-MMM-yy hh:mm:ss tt", CultureInfo.InvariantCulture.DateTimeFormat);
+        if (text.Contains("AM") || text.Contains("PM")) //28-Apr-22 07:25 PM
+            return DateTime.ParseExact(text, "dd-MMM-yy hh:mm:ss tt", CultureInfo.InvariantCulture.DateTimeFormat);
+        return DateTime.ParseExact(text, "dd-MMM-yy HH:mm:ss", CultureInfo.InvariantCulture.DateTimeFormat);
     }
 
     public enum month

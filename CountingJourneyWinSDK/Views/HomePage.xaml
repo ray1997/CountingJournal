@@ -44,8 +44,9 @@
                                        WithPics="{StaticResource withPicView}"/>
             </Grid.Resources>
             <ListView ItemsSource="{x:Bind ViewModel.CountingMessages, Mode=TwoWay}"
-                      ItemTemplateSelector="{StaticResource messageView}" MaxHeight="150"
-                      HorizontalAlignment="Left" MaxWidth="150">
+                      ItemTemplateSelector="{StaticResource messageView}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch">
                 <ListView.Header>
                     <StackPanel Orientation="Horizontal">
                         <Button Command="{x:Bind ViewModel.ListingMessagesCommand}"

@@ -60,6 +60,7 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
+	<rescap:Capability Name="broadFileSystemAccess" />
   </Capabilities>
 
   <genTemplate:Metadata>
