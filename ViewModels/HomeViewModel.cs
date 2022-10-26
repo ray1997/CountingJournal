@@ -36,7 +36,7 @@ public partial class HomeViewModel : ObservableRecipient
         OnPropertyChanged(nameof(ShowCSVGather));
     }
 
-    [ICommand]
+    [RelayCommand]
     private async Task ListingMessages()
     {
         //StorageFolder storageFolder = ApplicationData.Current.LocalFolder;
@@ -57,7 +57,7 @@ public partial class HomeViewModel : ObservableRecipient
         //CountingMessages = new(Messages.Select(i => IsCounting.Decide(i)));
     }
 
-    [ICommand]
+    [RelayCommand]
     private async void Counting()
     {
         if (CountingMessages is null)
@@ -118,19 +118,29 @@ public partial class HomeViewModel : ObservableRecipient
         }
     }
 
-    [ICommand]
+    [RelayCommand]
     private async Task GetCSVFile()
     {
-        if (appConfig is not null)
+        if (appConfig is not null &&
+            !string.IsNullOrEmpty(appConfig.CSVID) &&
+            !string.IsNullOrWhiteSpace(appConfig.CSVID))
         {
-            if (!string.IsNullOrEmpty(appConfig.CSVID) && !string.IsNullOrWhiteSpace(appConfig.CSVID))
-            {
-                CSVFile = await SAP.FutureAccessList.GetFileAsync(appConfig.CSVID);
-            }
+            CSVFile = await SAP.FutureAccessList.GetFileAsync(appConfig.CSVID);
         }
 
-        CSVFile = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync("data.csv");
-        appConfig.CSVID = SAP.FutureAccessList.Add(CSVFile);
-        OnPropertyChanged(nameof(ShowCSVGather));
+        var picker = new FileOpenPicker()
+        {
+            SuggestedStartLocation = PickerLocationId.Desktop,
+            ViewMode = PickerViewMode.List
+        };
+        picker.FileTypeFilter.Add(".csv");
+        var result = await picker.PickSingleFileAsync();
+        if (result is StorageFile picked)
+        {
+            //CSVFile = await Windows.Storage.ApplicationData.Current.LocalFolder.GetFileAsync("data.csv");
+            appConfig.CSVID = SAP.FutureAccessList.Add(picked);
+            CSVFile = picked;
+            OnPropertyChanged(nameof(ShowCSVGather));
+        }
     }
 }
