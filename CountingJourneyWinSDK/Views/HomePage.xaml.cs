@@ -18,6 +18,19 @@ public sealed partial class HomePage : Page
         ViewModel = App.GetService<HomeViewModel>();
         InitializeComponent();
     }
+
+    private void SetJumpMode(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioMenuFlyoutItem item)
+        {
+            switch (item.Tag.ToString())
+            {
+                case "filler": ViewModel.SelectedJump = JumpMode.Filler; break;
+                case "number": ViewModel.SelectedJump = JumpMode.Message; break;
+                case "confirm": ViewModel.SelectedJump = JumpMode.ConfirmedFiller; break;
+            }
+        }
+    }
 }
 
 public class MessageTemplate : DataTemplateSelector

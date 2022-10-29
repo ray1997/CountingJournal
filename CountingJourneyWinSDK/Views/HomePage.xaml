@@ -55,7 +55,35 @@
                 </AppBarButton.Flyout>
             </AppBarButton>
             <AppBarSeparator/>
-            <AppBarButton Command="{x:Bind ViewModel.SkipToNextFillerCommand}"
+            <AppBarButton Label="Jump mode">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEB9D;" />
+                </AppBarButton.Icon>
+                <AppBarButton.Flyout>
+                    <MenuFlyout>
+                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughFiller, Mode=OneWay}"
+                                             Click="SetJumpMode" Tag="filler" Text="Filler"/>
+                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughNumber, Mode=OneWay}"
+                                             Click="SetJumpMode"  Text="Number" Tag="number"/>
+                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughConfirmedFiller, Mode=OneWay}"
+                                             Click="SetJumpMode"  Text="Confirmed filler" Tag="confirm"/>
+                    </MenuFlyout>
+                </AppBarButton.Flyout>
+            </AppBarButton>
+            <AppBarButton Command="{x:Bind ViewModel.FirstOfJumpCommand}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEB9E;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton Command="{x:Bind ViewModel.JumpPreviousCommand}" Icon="Previous"/>
+            <AppBarButton Icon="Next" Command="{x:Bind ViewModel.JumpNextCommand}"/>
+            <AppBarButton Command="{x:Bind ViewModel.LastOfJumpCommand}">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEB9D;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+
+            <!--<AppBarButton Command="{x:Bind ViewModel.SkipToNextFillerCommand}"
                           Icon="Next"
                           Label="Skip to next filler"/>
             <AppBarButton Command="{x:Bind ViewModel.SkipToNextFillerNotCommand}"
@@ -63,7 +91,7 @@
                           Label="Skip to next confirmed number"/>
             <AppBarButton Command="{x:Bind ViewModel.JumpToLatestConfirmedFillerCommand}"
                           Icon="Next"
-                          Label="Jump to latest confirmed filler"/>
+                          Label="Jump to latest confirmed filler"/>-->
         </CommandBar>
         <Button Content="&#xE1A5;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center"
                 Margin="12,0" Command="{x:Bind ViewModel.GetCSVFileCommand}" Visibility="Collapsed">
@@ -82,6 +110,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Rectangle Grid.ColumnSpan="3" Opacity="0.25" Visibility="{x:Bind ConfirmedFiller, Mode=OneWay}"
+                                   Fill="{ThemeResource AccentAcrylicBackgroundFillColorDefaultBrush}"/>
                         <FontIcon Glyph="{x:Bind FillerIcon, Mode=OneWay}" VerticalAlignment="Center"
                                   ToolTipService.ToolTip="{x:Bind FillerTooltip, Mode=OneWay}" Margin="0,0,5,0"
                                   HorizontalAlignment="Center"
@@ -112,7 +142,13 @@
                                Stretch="Uniform" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Column="2">
-                            <Button Command="{x:Bind ConfirmThisMessageAsFillerCommand}">
+                                <TextBlock>
+                                As number: <Run Text="{x:Bind AsNumber}"/>
+                                </TextBlock>
+                                <TextBlock Margin="5,0">
+                                Expected: <Run Text="{x:Bind ExpectNumber}"/>
+                                </TextBlock>
+                                <Button Command="{x:Bind ConfirmThisMessageAsFillerCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <FontIcon Glyph="&#xE109;"/>
                                     <TextBlock Text="Confirmed filler"/>
@@ -136,6 +172,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
+                        <Rectangle Grid.ColumnSpan="3" Opacity="0.25" Visibility="{x:Bind ConfirmedFiller, Mode=OneWay}"
+                                   Fill="{ThemeResource AccentAcrylicBackgroundFillColorDefaultBrush}"/>
                         <FontIcon Glyph="{x:Bind FillerIcon, Mode=OneWay}" VerticalAlignment="Center"
                                   ToolTipService.ToolTip="{x:Bind FillerTooltip, Mode=OneWay}" Margin="0,0,5,0"
                                   HorizontalAlignment="Center"
@@ -159,6 +197,12 @@
                                    VerticalAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Column="2">
+                            <TextBlock>
+                                As number: <Run Text="{x:Bind AsNumber}"/>
+                            </TextBlock>
+                            <TextBlock Margin="5,0">
+                                Expected: <Run Text="{x:Bind ExpectNumber}"/>
+                            </TextBlock>
                             <Button Command="{x:Bind ConfirmThisMessageAsFillerCommand}">
                                 <StackPanel Orientation="Horizontal">
                                     <FontIcon Glyph="&#xE109;"/>

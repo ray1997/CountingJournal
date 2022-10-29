@@ -16,6 +16,7 @@ using CountingJournal.Model.Messages;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text;
+using System;
 
 namespace CountingJournal.ViewModels;
 
@@ -26,16 +27,6 @@ public partial class HomeViewModel : ObservableRecipient
 
     [ObservableProperty]
     private ObservableCollection<MessageViewModel>? countingMessages;
-
-
-    [RelayCommand]
-    private void JumpToLatestConfirmedFiller()
-    {
-        var lastConfirmed = CountingMessages.Last(msg => msg.ConfirmedFiller);
-        if (lastConfirmed is null)
-            return;
-        SelectedMessage = CountingMessages.IndexOf(lastConfirmed);
-    }
 
     [ObservableProperty]
     StorageFile? cSVFile = null;
@@ -244,6 +235,8 @@ public partial class HomeViewModel : ObservableRecipient
     [ObservableProperty]
     int totalFiller = -1;
 
+
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMessageSelected))]
     [NotifyCanExecuteChangedFor(nameof(SkipToNextFillerCommand))]
@@ -285,6 +278,143 @@ public partial class HomeViewModel : ObservableRecipient
         catch { }
     }
 
+    [RelayCommand]
+    private void JumpToLatestConfirmedFiller()
+    {
+        var lastConfirmed = CountingMessages.Last(msg => msg.ConfirmedFiller);
+        if (lastConfirmed is null)
+            return;
+        SelectedMessage = CountingMessages.IndexOf(lastConfirmed);
+    }
+
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsJumpThroughFiller))]
+    [NotifyPropertyChangedFor(nameof(IsJumpThroughNumber))]
+    [NotifyPropertyChangedFor(nameof(IsJumpThroughConfirmedFiller))]
+    private JumpMode selectedJump = JumpMode.Filler;
+
+    public bool IsJumpThroughFiller => SelectedJump == JumpMode.Filler;
+    public bool IsJumpThroughNumber => SelectedJump == JumpMode.Message;
+    public bool IsJumpThroughConfirmedFiller => SelectedJump == JumpMode.ConfirmedFiller;
+
+    [RelayCommand]
+    private void JumpPrevious()
+    {
+        if (SelectedMessage < 0)
+            return;
+        try
+        {
+            var next = SelectedMessage;
+            do
+            {
+                next--;
+                if (next < 0)
+                {
+                    SelectedMessage = -1;
+                    return;
+                }
+            }
+            while (ConditionStillMet(next));
+
+            SelectedMessage = next;
+        }
+        catch { }
+    }
+
+    [RelayCommand]
+    private void JumpNext()
+    {
+        if (SelectedMessage >= CountingMessages.Count - 1)
+            return;
+        try
+        {
+            var next = SelectedMessage;
+            do
+            {
+                next++;
+                if (next >= CountingMessages.Count)
+                {
+                    SelectedMessage = CountingMessages.Count - 1;
+                    return;
+                }
+            }
+            while (ConditionStillMet(next));
+
+            SelectedMessage = next;
+        }
+        catch { }
+    }
+
+    public bool ConditionStillMet(int index)
+    {
+        try
+        {
+            switch (SelectedJump)
+            {
+                case JumpMode.Filler:
+                    return !CountingMessages[index].IsFiller;
+                case JumpMode.Message:
+                    return CountingMessages[index].IsFiller;
+                case JumpMode.ConfirmedFiller:
+                    return !CountingMessages[index].ConfirmedFiller;
+            }
+        }
+        catch {  }
+        return false;
+    }
+
+    [RelayCommand]
+    private void FirstOfJump()
+    {
+        switch (SelectedJump)
+        {
+            case JumpMode.Filler:
+                var firstFiller = CountingMessages.FirstOrDefault(msg => msg.IsFiller);
+                if (firstFiller is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstFiller);
+                break;
+            case JumpMode.Message:
+                var firstCount = CountingMessages.FirstOrDefault(msg => !msg.IsFiller);
+                if (firstCount is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstCount);
+                break;
+            case JumpMode.ConfirmedFiller:
+                var firstVerifiedFiller = CountingMessages.FirstOrDefault(msg => msg.ConfirmedFiller);
+                if (firstVerifiedFiller is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstVerifiedFiller);
+                break;
+        }
+    }
+
+    [RelayCommand]
+    private void LastOfJump()
+    {
+        switch (SelectedJump)
+        {
+            case JumpMode.Filler:
+                var firstFiller = CountingMessages.LastOrDefault(msg => msg.IsFiller);
+                if (firstFiller is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstFiller);
+                break;
+            case JumpMode.Message:
+                var firstCount = CountingMessages.LastOrDefault(msg => !msg.IsFiller);
+                if (firstCount is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstCount);
+                break;
+            case JumpMode.ConfirmedFiller:
+                var firstVerifiedFiller = CountingMessages.LastOrDefault(msg => msg.ConfirmedFiller);
+                if (firstVerifiedFiller is null)
+                    return;
+                SelectedMessage = CountingMessages.IndexOf(firstVerifiedFiller);
+                break;
+        }
+    }
     public Visibility ShowCSVGather
     {
         get
@@ -311,4 +441,11 @@ public partial class HomeViewModel : ObservableRecipient
         appConfig.CSVID = SAP.FutureAccessList.Add(file);
         CSVFile = file;
     }
+}
+
+public enum JumpMode
+{
+    Filler,
+    Message,
+    ConfirmedFiller
 }
