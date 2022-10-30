@@ -105,11 +105,12 @@ public static class BasicCalculation
             catch { }
         }
 
-#if DEBUG
-        throw new Exception($"No formula for {input}");
-#else
-        return input;
-#endif
+        return string.Empty;
+//#if DEBUG
+//        throw new Exception($"No formula for {input}");
+//#else
+//        return input;
+//#endif
     }
 
     private static string TryPow(string input)

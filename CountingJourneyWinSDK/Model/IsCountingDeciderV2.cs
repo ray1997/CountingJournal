@@ -41,7 +41,7 @@ public static class IsCountingDeciderV2
         var charArray = now.Content
             .Where(c => char.IsDigit(c))
             .ToArray();
-        return new String(charArray);
+        return new string(charArray);
     }
 
     public static string PerhapsTheNumberIsMixedWithTextAndNumber(Message now, string previous)
@@ -53,14 +53,23 @@ public static class IsCountingDeciderV2
         bool[] hasAll = new bool[nextInt.ToString().Length];
         List<char> nums = now.Content.Where(c => char.IsDigit(c)).ToList();
 
-        for (var i = 0; i < hasAll.Length; i++)
+        int lastIndex = -1;
+        try
         {
-            if (nums.Contains(nextStr[i]))
+            for (var i = 0; i < hasAll.Length; i++)
             {
-                int index = nums.IndexOf(nextStr[i]);
-                nums.RemoveAt(index);
-                hasAll[i] = true;
+                if (nums.IndexOf(nextStr[i], lastIndex) > 0)
+                {
+                    int index = nums.IndexOf(nextStr[i], lastIndex);
+                    lastIndex = index;
+                    nums.RemoveAt(index);
+                    hasAll[i] = true;
+                }
             }
+        }
+        catch
+        {
+            return string.Empty;
         }
         var collapsed = hasAll.Distinct().ToList();
         if (collapsed.Count > 1)

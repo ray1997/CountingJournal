@@ -1,7 +1,9 @@
 ﻿using CountingJournal.Model;
+using CountingJournal.Model.Messages;
 using CountingJournal.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Messenger = CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger;
 
 namespace CountingJournal.Views;
 
@@ -29,6 +31,26 @@ public sealed partial class HomePage : Page
                 case "number": ViewModel.SelectedJump = JumpMode.Message; break;
                 case "confirm": ViewModel.SelectedJump = JumpMode.ConfirmedFiller; break;
             }
+        }
+    }
+
+    private void CommandBarResizer(object sender, SizeChangedEventArgs e)
+    {
+        if (e.NewSize.Width <= 700)
+        {
+            VisualStateManager.GoToState(this, nameof(smolState), true);
+        }
+        else if (e.NewSize.Width > 700 && e.NewSize.Width <= 1024)
+        {
+            VisualStateManager.GoToState(this, nameof(midState), true);
+        }
+        else if (e.NewSize.Width > 1024 && e.NewSize.Width <= 1200)
+        {
+            VisualStateManager.GoToState(this, nameof(wideState), true);
+        }
+        else if (e.NewSize.Width > 1200)
+        {
+            VisualStateManager.GoToState(this, nameof(maxState), true);
         }
     }
 }

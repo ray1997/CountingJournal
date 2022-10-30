@@ -23,7 +23,7 @@ public static class Roman
 
     public static int ToNumber(string msg)
     {
-        RomanNumerals.RomanNumeral.TryParse(msg, out var romanNumerals);
-        return romanNumerals;
+        var attempt = RomanNumerals.RomanNumeral.TryParse(msg, out var romanNumerals);
+        return attempt ? romanNumerals : -1;
     }
 }

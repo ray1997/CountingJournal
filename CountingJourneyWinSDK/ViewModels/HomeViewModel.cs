@@ -6,17 +6,14 @@ using CountingJournal.Helpers.Text;
 using CountingJournal.Model;
 using Microsoft.UI.Xaml;
 using Windows.Storage;
-using Windows.Storage.Pickers;
-using WinRT;
-using static CountingJournal.MainWindow;
-using static CountingJournal.Helpers.Text.Manual;
 using SAP = Windows.Storage.AccessCache.StorageApplicationPermissions;
 using MSG = CommunityToolkit.Mvvm.Messaging.WeakReferenceMessenger;
 using CountingJournal.Model.Messages;
-using System.ComponentModel;
 using System.Text.Json;
-using System.Text;
-using System;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using System.Diagnostics;
+using Microsoft.UI.Xaml.Controls;
 
 namespace CountingJournal.ViewModels;
 
@@ -118,9 +115,20 @@ public partial class HomeViewModel : ObservableRecipient
         //CountingMessages = new(Messages.Select(i => IsCounting.Decide(i)));
     }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HideLabelWhileCounting))]
+    private bool isCountingRightNow = false;
+
+    public CommandBarDefaultLabelPosition HideLabelWhileCounting => 
+        IsCountingRightNow ? CommandBarDefaultLabelPosition.Collapsed : CommandBarDefaultLabelPosition.Right;
+
+    [ObservableProperty]
+    string latestMessageCount = "";
+
     [RelayCommand]
-    private async void Counting()
+    private async Task Counting()
     {
+        IsCountingRightNow = true;
         if (CountingMessages is null)
             CountingMessages = new();
         if (Messages is null)
@@ -132,14 +140,21 @@ public partial class HomeViewModel : ObservableRecipient
         }
         IsCounting.ResetLastSender();
         LatestCountNumber = 0;
+        TotalFiller = 0;
         CountingMessages.Clear();
         MessageViewModel? previousAnchor = null;
         int acceptableGapSize = 2;
+        var previous = string.Empty;
+        var next = string.Empty;
         foreach (var msg in Messages)
         {
+            LatestMessageCount = $"Processing: {msg.Content}\r\n" +
+                $"Latest number = {LatestCountNumber}";
             if (msg.ConfirmedFiller)
+            {
+                TotalFiller++;
                 continue;
-            var previous = string.Empty;
+            }            
             if (previousAnchor is null)
             {
                 previous = "0";
@@ -151,7 +166,7 @@ public partial class HomeViewModel : ObservableRecipient
                     previousAnchor.Content;
             }
 
-            var next = msg.Content;
+            next = msg.Content;
 
             bool shouldSwitchAnchor = false;
 
@@ -159,29 +174,49 @@ public partial class HomeViewModel : ObservableRecipient
             bool triedFilterOnlyNumber = false;
             bool presumeAllNumberSpread = false;
             bool triedConvertFromThaiNum = false;
+            bool triedThaiText = false;
             bool triedYamokConvert = false;
+            bool triedRoman = false;
+            bool isDotNine = false;
+            bool triedCalculate = false;
+            bool triedConvert = false;
+            bool isReferenceCheck = false;
+            bool isPicCheck = false;
+            await Task.Run(() =>
+            {
+                Debug.WriteLine($"Attemp parsing number: {msg.Content}" +
+                $"\r\nNumber | Spread | TH Num | TH Txt |  Yamok |  Roman |     .9 |    Pow |  Weird |    Ref |    Pic" +
+                $"\r\n{(triedFilterOnlyNumber ? "Y" : "n"),-6} | " +
+                $"{(presumeAllNumberSpread ? "Y" : "n"),-6} | " +
+                $"{(triedConvertFromThaiNum ? "Y" : "n"),-6} | " +
+                $"{(triedThaiText ? "Y" : "n"),-6} | " +
+                $"{(triedYamokConvert ? "Y" : "n"),-6} | " +
+                $"{(triedRoman ? "Y" : "n"),-6} | " +
+                $"{(isDotNine ? "Y" : "n"),-6} | " +
+                $"{(triedCalculate ? "Y" : "n"),-6} | " +
+                $"{(triedConvert ? "Y" : "n"),-6} | " +
+                $"{(isReferenceCheck ? "Y" : "n"),-6} | " +
+                $"{(isPicCheck ? "Y" : "n"),-6} | ");
+            });
 
         retry:
             shouldSwitchAnchor = IsCountingDeciderV2.ShouldAddIn(previous, next, acceptableGapSize);
+            if (string.IsNullOrEmpty(msg.Content))
+            {
+                goto nomsg;
+            }
             if (shouldSwitchAnchor)
             {
                 acceptableGapSize = 2;
                 msg.IsFiller = false;
                 msg.AsNumber = int.Parse(next);
                 previousAnchor = msg;
+                LatestCountNumber = int.Parse(next);
                 continue;
             }
             else
                 next = msg.Content;
-            //Is it contains text?
-            //2384 fillers: no changes
-            //1363 fillers: filter to number only
-            //911 fillers: presume mixed with other number
-            //1223 fillers: fix bug on presumeNumberSpread allow distinct one false pass through as number
-            //1146 fillers: convert thai number to arabic
-            //1128 fillers: convert repeater symbol to normal number
             acceptableGapSize++;
-
 
             if (!triedFilterOnlyNumber)
             {
@@ -202,40 +237,130 @@ public partial class HomeViewModel : ObservableRecipient
                 triedConvertFromThaiNum = true;
                 goto retry;
             }
-            if (!triedYamokConvert)
+            if (!triedThaiText)
+            {
+                try
+                {
+                    var test = ThaiTextNumber.ConvertToNumber(next);
+                    if (test > 0)
+                        next = test.ToString();
+                    triedThaiText = true;
+                    goto retry;
+                }
+                catch
+                {
+                    triedThaiText = true;
+                }
+            }
+            if (next.Contains(RepeaterSymbol.Repeater) && !triedYamokConvert)
             {
                 next = RepeaterSymbol.Translate(next, int.Parse(previous) + 1);
                 triedYamokConvert = true;
+                goto retry;
+            }
+            if (!triedRoman)
+            {
+                var test = Roman.ToNumber(next);
+                if (test > 0)
+                    next = test.ToString();
+                triedRoman = true;
+                goto retry;
+            }
+            if (!isDotNine && next.Contains('.') && next.Contains('9'))
+            {
+                bool result = float.TryParse(next, out float parsed);
+                if (result)
+                {
+                    int converse = (int)parsed;
+                    isDotNine = true;
+                    next = converse.ToString();
+                    goto retry;
+                }
+                isDotNine = true;
+            }
+            if (!triedCalculate)
+            {
+                try
+                {
+                    var result = BasicCalculation.Calculate(next, $"{int.Parse(previous) + 1}");
+                    next = result == string.Empty ? next : result;
+                    triedCalculate = true;
+                    goto retry;
+                }
+                catch { }
+                triedCalculate = true;
+            }
+            if (!triedConvert)
+            {
+                var result = WeirdNumber.ToNormal(next);
+                result = TinyNumber.ToNormal(result);
+                next = result;
+                triedConvert = true;
+                goto retry;
+            }
+            if (!isReferenceCheck)
+            {
+                if (Manual.MemeReference.ContainsKey(next))
+                {
+                    next = Manual.MemeReference[next].ToString();
+                }
+                isReferenceCheck = true;
+                goto retry;
+            }
+            nomsg:
+            if (!string.IsNullOrEmpty(msg.Attachments) && 
+                string.IsNullOrEmpty(msg.Content) && !isPicCheck)
+            {
+                if (Manual.ImageToNumber.ContainsKey(msg.Attachments))
+                {
+                    next = Manual.ImageToNumber[msg.Attachments].ToString();
+                }
+                isPicCheck = true;
                 goto retry;
             }
 
             //Finally give up
             msg.ExpectNumber = int.Parse(previous) + 1;
             msg.IsFiller = true;
+            TotalFiller++;
         }
         CountingMessages = new(Messages.Where(msg => Consider(msg)));
         TotalFiller = Messages.Where(msg => msg.IsFiller).Count();
+        IsCountingRightNow = false;
     }
 
     private bool Consider(MessageViewModel msg)
     {
-        if (ShowFillers && msg.IsFiller)
+        if (ShowFillers && msg.IsFiller && !HideOnlyConfirmedFiller)
             return true;
+        else if (!ShowFillers && HideOnlyConfirmedFiller)
+        {
+            if (msg.ConfirmedFiller)
+                return false;
+            else if (msg.IsFiller && !msg.ConfirmedFiller)
+                return true;
+            else
+                return true;
+        }
         else if (ShowConfirmed && !msg.IsFiller)
             return true;
         return false;
     }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanSelectConfirmFiller))]
     bool showFillers = true;
+
+    public bool CanSelectConfirmFiller => ShowFillers == false;
+
+    [ObservableProperty]
+    bool hideOnlyConfirmedFiller = false;
 
     [ObservableProperty]
     bool showConfirmed = true;
 
     [ObservableProperty]
     int totalFiller = -1;
-
-
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMessageSelected))]
@@ -440,6 +565,22 @@ public partial class HomeViewModel : ObservableRecipient
         StorageFile file = await StorageFile.GetFileFromPathAsync(@"D:\UserData\Desktop\Counting-20221026-1800\countTo10k.csv");
         appConfig.CSVID = SAP.FutureAccessList.Add(file);
         CSVFile = file;
+    }
+
+    [RelayCommand]
+    private void ExportJSON()
+    {
+        var path = @"D:\UserData\Desktop\Counting-20221026-1800\final.json";
+        if (File.Exists(path))
+            File.Delete(path);
+        var json = JsonSerializer.Serialize<ObservableCollection<Message>>(
+            new(CountingMessages.Where(i => !i.ConfirmedFiller)), 
+            new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            });
+        File.WriteAllText(path, json);
     }
 }
 
