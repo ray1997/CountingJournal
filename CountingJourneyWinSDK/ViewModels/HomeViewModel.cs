@@ -116,6 +116,9 @@ public partial class HomeViewModel : ObservableRecipient
     }
 
     [ObservableProperty]
+    private bool showCountingInfoBar = true;
+
+    [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HideLabelWhileCounting))]
     private bool isCountingRightNow = false;
 
@@ -124,6 +127,9 @@ public partial class HomeViewModel : ObservableRecipient
 
     [ObservableProperty]
     string latestMessageCount = "";
+
+    [ObservableProperty]
+    int totalParticipant = -1;
 
     [RelayCommand]
     private async Task Counting()
@@ -138,6 +144,10 @@ public partial class HomeViewModel : ObservableRecipient
             Messages.Clear();
             await ListingMessages();
         }
+        if (TotalParticipant < 0)
+        {
+            TotalParticipant = Messages.Select(msg => msg.Sender.UserID).Distinct().Count();
+        }
         IsCounting.ResetLastSender();
         LatestCountNumber = 0;
         TotalFiller = 0;
@@ -148,8 +158,7 @@ public partial class HomeViewModel : ObservableRecipient
         var next = string.Empty;
         foreach (var msg in Messages)
         {
-            LatestMessageCount = $"Processing: {msg.Content}\r\n" +
-                $"Latest number = {LatestCountNumber}";
+            LatestMessageCount = $"Processing: {msg.Content}";
             if (msg.ConfirmedFiller)
             {
                 TotalFiller++;
@@ -326,6 +335,7 @@ public partial class HomeViewModel : ObservableRecipient
         }
         CountingMessages = new(Messages.Where(msg => Consider(msg)));
         TotalFiller = Messages.Where(msg => msg.IsFiller).Count();
+        LatestMessageCount = "";
         IsCountingRightNow = false;
     }
 

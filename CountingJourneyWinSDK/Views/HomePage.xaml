@@ -7,192 +7,148 @@
     xmlns:m="using:CountingJournal.Model"
     xmlns:vm="using:CountingJournal.ViewModels"
     xmlns:local="using:CountingJournal.Views"
-    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
-    mc:Ignorable="d"
-    SizeChanged="CommandBarResizer">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    mc:Ignorable="d">
 
     <Grid x:Name="ContentArea">
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState x:Name="smolState">
-
-                    <VisualState.Setters>
-                        <Setter Target="FinalNumberStat.Visibility" Value="Collapsed"/>
-                        <Setter Target="totalFillerStat.Visibility" Value="Collapsed"/>
-                        <Setter Target="infosSeparator.Visibility" Value="Collapsed"/>
-                        <Setter Target="mainCommand.IsDynamicOverflowEnabled" Value="True"/>
-                        <Setter Target="loadMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="countingMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="contentViewButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpModeButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpToFirstButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="previousItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="nextItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpToLastButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="saveToJsonButton.LabelPosition" Value="Collapsed"/>
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="midState">
-                    <VisualState.Setters>
-                        <Setter Target="FinalNumberStat.Visibility" Value="Collapsed"/>
-                        <Setter Target="totalFillerStat.Visibility" Value="Collapsed"/>
-                        <Setter Target="infosSeparator.Visibility" Value="Collapsed"/>
-                        <Setter Target="mainCommand.IsDynamicOverflowEnabled" Value="False"/>
-                        <Setter Target="loadMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="countingMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="contentViewButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpModeButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpToFirstButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="previousItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="nextItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpToLastButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="saveToJsonButton.LabelPosition" Value="Collapsed"/>
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="wideState">
-                    <VisualState.Setters>
-                        <Setter Target="FinalNumberStat.Visibility" Value="Visible"/>
-                        <Setter Target="totalFillerStat.Visibility" Value="Visible"/>
-                        <Setter Target="infosSeparator.Visibility" Value="Visible"/>
-                        <Setter Target="mainCommand.IsDynamicOverflowEnabled" Value="False"/>
-                        <Setter Target="loadMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="countingMessagesButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="contentViewButton.LabelPosition" Value="Default"/>
-                        <Setter Target="jumpModeButton.LabelPosition" Value="Default"/>
-                        <Setter Target="jumpToFirstButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="previousItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="nextItemButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="jumpToLastButton.LabelPosition" Value="Collapsed"/>
-                        <Setter Target="saveToJsonButton.LabelPosition" Value="Default"/>
-                    </VisualState.Setters>
-                </VisualState>
-                <VisualState x:Name="maxState">
-                    <VisualState.Setters>
-                        <Setter Target="FinalNumberStat.Visibility" Value="Visible"/>
-                        <Setter Target="totalFillerStat.Visibility" Value="Visible"/>
-                        <Setter Target="infosSeparator.Visibility" Value="Visible"/>
-                        <Setter Target="mainCommand.IsDynamicOverflowEnabled" Value="False"/>
-                        <Setter Target="loadMessagesButton.LabelPosition" Value="Default"/>
-                        <Setter Target="countingMessagesButton.LabelPosition" Value="Default"/>
-                        <Setter Target="contentViewButton.LabelPosition" Value="Default"/>
-                        <Setter Target="jumpModeButton.LabelPosition" Value="Default"/>
-                        <Setter Target="jumpToFirstButton.LabelPosition" Value="Default"/>
-                        <Setter Target="previousItemButton.LabelPosition" Value="Default"/>
-                        <Setter Target="nextItemButton.LabelPosition" Value="Default"/>
-                        <Setter Target="jumpToLastButton.LabelPosition" Value="Default"/>
-                        <Setter Target="saveToJsonButton.LabelPosition" Value="Default"/>
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <MenuBar Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+            <MenuBarItem Title="File">
+                <MenuFlyoutItem Command="{x:Bind ViewModel.ListingMessagesCommand}"
+                                Text="Load messages">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE149;"/>
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F5"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Icon="Save"
+                                Text="Save to Json"
+                                Command="{x:Bind ViewModel.ExportJSONCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="S" Modifiers="Control"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>                    
+                </MenuFlyoutItem>
+            </MenuBarItem>
+            <MenuBarItem Title="Message">
+                <MenuFlyoutItem Text="Count"
+                                Command="{x:Bind ViewModel.CountingCommand}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE0AB;"/>
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="F6"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <ToggleMenuFlyoutItem IsChecked="{x:Bind ViewModel.ShowCountingInfoBar, Mode=TwoWay}"
+                                      Text="Show counting info bar">
+                    <ToggleMenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE946;"/>
+                    </ToggleMenuFlyoutItem.Icon>
+                </ToggleMenuFlyoutItem>
+            </MenuBarItem>
+            <MenuBarItem Title="Filter">
+                <ToggleMenuFlyoutItem Text="Show filler" 
+                                      IsChecked="{x:Bind ViewModel.ShowFillers, Mode=TwoWay}">
+                    <ToggleMenuFlyoutItem.Icon>
+                        <SymbolIcon Symbol="Delete"/>
+                    </ToggleMenuFlyoutItem.Icon>
+                </ToggleMenuFlyoutItem>
+                <ToggleMenuFlyoutItem Text="Hide confirmed filler" 
+                                      IsEnabled="{x:Bind ViewModel.CanSelectConfirmFiller, Mode=OneWay}"
+                                      IsChecked="{x:Bind ViewModel.HideOnlyConfirmedFiller, Mode=TwoWay}">
+                    <ToggleMenuFlyoutItem.Icon>
+                        <SymbolIcon Symbol="View"/>
+                    </ToggleMenuFlyoutItem.Icon>                    
+                </ToggleMenuFlyoutItem>
+                <ToggleMenuFlyoutItem Text="Show number"
+                                      IsChecked="{x:Bind ViewModel.ShowConfirmed, Mode=TwoWay}">
+                    <ToggleMenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xF87B;"/>
+                    </ToggleMenuFlyoutItem.Icon>
+                </ToggleMenuFlyoutItem>
+            </MenuBarItem>
+            <MenuBarItem Title="Navigate">
+                <MenuFlyoutSubItem Text="Jump mode" Icon="ImportAll">
+                    <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughFiller, Mode=OneWay}"
+                                         Click="SetJumpMode" Tag="filler" Text="Filler">
+                        <RadioMenuFlyoutItem.Icon>
+                            <SymbolIcon Symbol="Delete"/>
+                        </RadioMenuFlyoutItem.Icon>
+                    </RadioMenuFlyoutItem>
+                    <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughNumber, Mode=OneWay}"
+                                         Click="SetJumpMode"  Text="Number" Tag="number">
+                        <RadioMenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xF87B;"/>
+                        </RadioMenuFlyoutItem.Icon>
+                    </RadioMenuFlyoutItem>
+                    <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughConfirmedFiller, Mode=OneWay}"
+                                         Click="SetJumpMode"  Text="Confirmed filler" Tag="confirm">
+                        <RadioMenuFlyoutItem.Icon>
+                            <FontIcon Glyph="&#xF87B;"/>
+                        </RadioMenuFlyoutItem.Icon>
+                    </RadioMenuFlyoutItem>
+                </MenuFlyoutSubItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.FirstOfJumpCommand}"
+                                Text="Go to first item">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xEB9E;"/>
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Insert" Modifiers="Control"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Command="{x:Bind ViewModel.LastOfJumpCommand}"
+                                Text="Go to last item">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xEB9D;"/>
+                    </MenuFlyoutItem.Icon>
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete" Modifiers="Control"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Icon="Previous"
+                                Command="{x:Bind ViewModel.JumpPreviousCommand}"
+                                Text="Previous item">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Insert"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Icon="Next"
+                                Command="{x:Bind ViewModel.JumpNextCommand}"
+                                Text="Next item">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Delete"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Text="Go to" Icon="Go">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Modifiers="Control" Key="G"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+            </MenuBarItem>
+        </MenuBar>
         <CommandBar HorizontalAlignment="Left" DefaultLabelPosition="{x:Bind ViewModel.HideLabelWhileCounting, Mode=OneWay}"
                     IsDynamicOverflowEnabled="False"
+                    Visibility="Collapsed"
                     x:Name="mainCommand">
-            <AppBarButton Command="{x:Bind ViewModel.ListingMessagesCommand}"
-                          Label="Load messages"
-                          x:Name="loadMessagesButton">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xE149;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton Command="{x:Bind ViewModel.CountingCommand}"
-                          Label="Count"
-                          x:Name="countingMessagesButton">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xE0AB;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarSeparator x:Name="infosSeparator"/>
-            <AppBarElementContainer Visibility="{x:Bind ViewModel.IsCountingRightNow, Mode=OneWay}"
-                                    Width="200">
-                <TextBlock FontSize="14" TextAlignment="Left" TextTrimming="CharacterEllipsis"
-                           VerticalAlignment="Center">
-                        Counting: <Run Text="{x:Bind ViewModel.LatestMessageCount, Mode=OneWay}"/>
-                </TextBlock>
-            </AppBarElementContainer>
-            <AppBarButton IsHitTestVisible="False"
-                          x:Name="FinalNumberStat" Visibility="Collapsed">
-                <AppBarButton.Content>
-                    <TextBlock Visibility="Collapsed">
-                        Final number: <Run Text="{x:Bind ViewModel.LatestCountNumber, Mode=OneWay}"/>
-                    </TextBlock>
-                </AppBarButton.Content>
-            </AppBarButton>
-            <AppBarButton IsHitTestVisible="False"
-                          x:Name="totalFillerStat">
-                <AppBarButton.Content>
-                    <TextBlock>
-                        Total filler: <Run Text="{x:Bind ViewModel.TotalFiller, Mode=OneWay}"/>
-                    </TextBlock>
-                </AppBarButton.Content>
-            </AppBarButton>
-            <AppBarSeparator/>
-            <AppBarButton Icon="Filter" x:Name="contentViewButton"
-                          Label="Filter">
-                <AppBarButton.Flyout>
-                    <MenuFlyout>
-                        <ToggleMenuFlyoutItem Text="Show filler" 
-                                              IsChecked="{x:Bind ViewModel.ShowFillers, Mode=TwoWay}"/>
-                        <ToggleMenuFlyoutItem Text="Hide confirmed filler" IsEnabled="{x:Bind ViewModel.CanSelectConfirmFiller, Mode=OneWay}"
-                                              IsChecked="{x:Bind ViewModel.HideOnlyConfirmedFiller, Mode=TwoWay}"/>
-                        <ToggleMenuFlyoutItem Text="Show number"
-                                              IsChecked="{x:Bind ViewModel.ShowConfirmed, Mode=TwoWay}"/>
-                    </MenuFlyout>
-                </AppBarButton.Flyout>
-            </AppBarButton>
-            <AppBarSeparator/>
-            <AppBarButton Label="Jump mode" x:Name="jumpModeButton">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xEB9D;" />
-                </AppBarButton.Icon>
-                <AppBarButton.Flyout>
-                    <MenuFlyout>
-                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughFiller, Mode=OneWay}"
-                                             Click="SetJumpMode" Tag="filler" Text="Filler"/>
-                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughNumber, Mode=OneWay}"
-                                             Click="SetJumpMode"  Text="Number" Tag="number"/>
-                        <RadioMenuFlyoutItem IsChecked="{x:Bind ViewModel.IsJumpThroughConfirmedFiller, Mode=OneWay}"
-                                             Click="SetJumpMode"  Text="Confirmed filler" Tag="confirm"/>
-                    </MenuFlyout>
-                </AppBarButton.Flyout>
-            </AppBarButton>
-            <AppBarButton Command="{x:Bind ViewModel.FirstOfJumpCommand}"
-                          Label="Go to first item"
-                          x:Name="jumpToFirstButton">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xEB9E;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarButton Command="{x:Bind ViewModel.JumpPreviousCommand}" Icon="Previous"
-                          Label="Previous item"
-                          x:Name="previousItemButton"/>
-            <AppBarButton Icon="Next" Command="{x:Bind ViewModel.JumpNextCommand}"
-                          Label="Next item"
-                          x:Name="nextItemButton"/>
-            <AppBarButton Command="{x:Bind ViewModel.LastOfJumpCommand}"
-                          Label="Go to last item"
-                          x:Name="jumpToLastButton">
-                <AppBarButton.Icon>
-                    <FontIcon Glyph="&#xEB9D;"/>
-                </AppBarButton.Icon>
-            </AppBarButton>
-            <AppBarSeparator/>
+            
             <AppBarButton Icon="Save"
                           x:Name="saveToJsonButton"
                           Label="Save to Json"
                           Command="{x:Bind ViewModel.ExportJSONCommand}"/>
         </CommandBar>
-        <Button Content="&#xE1A5;" FontFamily="Segoe MDL2 Assets" FontSize="24" HorizontalAlignment="Right" VerticalAlignment="Center"
-                Margin="12,0" Command="{x:Bind ViewModel.GetCSVFileCommand}" Visibility="Collapsed">
-            <Button.KeyboardAccelerators>
-                <KeyboardAccelerator Modifiers="Control" Key="A"/>
-            </Button.KeyboardAccelerators>
-        </Button>
-
+       
         <Grid Grid.Row="1">
             <Grid.Resources>
                 <DataTemplate x:DataType="vm:MessageViewModel"
@@ -323,6 +279,44 @@
                       SelectedIndex="{x:Bind ViewModel.SelectedMessage, Mode=TwoWay, FallbackValue=-1}">
             </ListView>
         </Grid>
-        
+
+        <Grid Background="{ThemeResource SystemColorControlAccentColor}"
+              Grid.Row="2" Padding="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <ProgressRing Width="24" Height="24"
+                              ToolTipService.ToolTip="Counting..."
+                              Visibility="{x:Bind ViewModel.IsCountingRightNow, Mode=OneWay}"/>
+                <TextBlock FontSize="14" TextAlignment="Left" TextTrimming="CharacterEllipsis"
+                           TextWrapping="Wrap" Margin="5,0"
+                           VerticalAlignment="Center"
+                           MaxWidth="240"
+                           MaxHeight="24">
+                        <Run Text="{x:Bind ViewModel.LatestMessageCount, Mode=OneWay}"/>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <FontIcon Glyph="&#xE902;"
+                          ToolTipService.ToolTip="Total participant"/>
+                <TextBlock Text="{x:Bind ViewModel.TotalParticipant, Mode=OneWay}" VerticalAlignment="Center"
+                           Margin="5,0"/>
+                <TextBlock Text="|" Margin="5,0,10,0"/>
+                <FontIcon Glyph="&#xE206;"
+                          ToolTipService.ToolTip="Total messages"/>
+                <TextBlock Text="{x:Bind ViewModel.Messages.Count, Mode=OneWay}" VerticalAlignment="Center"
+                           Margin="5,0"/>
+                <TextBlock Text="|" Margin="5,0"/>
+                <FontIcon Glyph="&#xE107;"
+                          ToolTipService.ToolTip="Total filler messages"/>
+                <TextBlock Text="{x:Bind ViewModel.TotalFiller, Mode=OneWay}" VerticalAlignment="Center"
+                           Margin="5,0"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Page>

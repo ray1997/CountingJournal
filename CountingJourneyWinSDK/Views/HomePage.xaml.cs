@@ -33,26 +33,6 @@ public sealed partial class HomePage : Page
             }
         }
     }
-
-    private void CommandBarResizer(object sender, SizeChangedEventArgs e)
-    {
-        if (e.NewSize.Width <= 700)
-        {
-            VisualStateManager.GoToState(this, nameof(smolState), true);
-        }
-        else if (e.NewSize.Width > 700 && e.NewSize.Width <= 1024)
-        {
-            VisualStateManager.GoToState(this, nameof(midState), true);
-        }
-        else if (e.NewSize.Width > 1024 && e.NewSize.Width <= 1200)
-        {
-            VisualStateManager.GoToState(this, nameof(wideState), true);
-        }
-        else if (e.NewSize.Width > 1200)
-        {
-            VisualStateManager.GoToState(this, nameof(maxState), true);
-        }
-    }
 }
 
 public class MessageTemplate : DataTemplateSelector
