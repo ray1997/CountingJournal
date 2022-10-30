@@ -16,6 +16,37 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        <!--Goto-->
+        <Grid Canvas.ZIndex="{x:Bind ViewModel.GoToControlsIndex, Mode=OneWay}"
+              Visibility="{x:Bind ViewModel.ShowGoToInput, Mode=OneWay}"
+              Grid.RowSpan="3"
+              HorizontalAlignment="Stretch"
+              VerticalAlignment="Stretch">
+            <Rectangle HorizontalAlignment="Stretch"
+                       Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                       Opacity="0.75"
+                       VerticalAlignment="Stretch"/>
+
+            <StackPanel Margin="0,140,0,0" 
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Header="Enter message to go to the exact input message"
+                         PlaceholderText="Message"
+                         MinWidth="240"
+                         x:Name="gotoInput"
+                         AcceptsReturn="False"
+                         KeyDown="SubmitAttempt"
+                         Text="{x:Bind ViewModel.GotoInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Margin="5,0"
+                        Command="{x:Bind ViewModel.GoToThisMessageCommand}">
+                        <SymbolIcon Symbol="Forward"/>
+                    </Button>
+                </StackPanel>
+                <TextBlock Text="No message found!" Visibility="{x:Bind ViewModel.NoMessageFound, Mode=OneWay}"/>
+            </StackPanel>
+        </Grid>
+        
         <MenuBar Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
             <MenuBarItem Title="File">
                 <MenuFlyoutItem Command="{x:Bind ViewModel.ListingMessagesCommand}"
@@ -131,24 +162,15 @@
                     </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
                 <MenuFlyoutSeparator/>
-                <MenuFlyoutItem Text="Go to" Icon="Go">
+                <MenuFlyoutItem Text="Go to" Icon="Go"
+                                Command="{x:Bind ViewModel.ShowGoToPromptCommand}">
                     <MenuFlyoutItem.KeyboardAccelerators>
                         <KeyboardAccelerator Modifiers="Control" Key="G"/>
                     </MenuFlyoutItem.KeyboardAccelerators>
                 </MenuFlyoutItem>
             </MenuBarItem>
         </MenuBar>
-        <CommandBar HorizontalAlignment="Left" DefaultLabelPosition="{x:Bind ViewModel.HideLabelWhileCounting, Mode=OneWay}"
-                    IsDynamicOverflowEnabled="False"
-                    Visibility="Collapsed"
-                    x:Name="mainCommand">
-            
-            <AppBarButton Icon="Save"
-                          x:Name="saveToJsonButton"
-                          Label="Save to Json"
-                          Command="{x:Bind ViewModel.ExportJSONCommand}"/>
-        </CommandBar>
-       
+        
         <Grid Grid.Row="1">
             <Grid.Resources>
                 <DataTemplate x:DataType="vm:MessageViewModel"
@@ -275,6 +297,7 @@
             <ListView ItemsSource="{x:Bind ViewModel.CountingMessages, Mode=TwoWay}"
                       ItemTemplateSelector="{StaticResource messageView}"
                       HorizontalAlignment="Stretch"
+                      x:Name="mainListView"
                       VerticalAlignment="Stretch"
                       SelectedIndex="{x:Bind ViewModel.SelectedMessage, Mode=TwoWay, FallbackValue=-1}">
             </ListView>

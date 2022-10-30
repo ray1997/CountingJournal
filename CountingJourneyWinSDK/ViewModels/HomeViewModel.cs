@@ -592,6 +592,58 @@ public partial class HomeViewModel : ObservableRecipient
             });
         File.WriteAllText(path, json);
     }
+
+    [RelayCommand]
+    private void ShowGoToPrompt()
+    {
+        if (SelectedMessage < 0)
+            SelectedMessage = 0;
+        ShowGoToInput = true;
+        MSG.Default.Send(new FocusOnInputBoxMessage(), Token.FocusOnInputTextBox);
+    }
+
+    [RelayCommand]
+    private async Task GoToThisMessage()
+    {
+        if (string.IsNullOrEmpty(GotoInput))
+        {
+            ShowGoToInput = false;
+            return;
+        }
+        var found = CountingMessages.Skip(SelectedMessage).FirstOrDefault(msg => msg.Content.Contains(GotoInput));
+        if (found is null)
+        {
+            NoMessageFound = true;
+            return;
+        }
+        SelectedMessage = CountingMessages.IndexOf(found);
+        ShowGoToInput = false;
+        GotoInput = string.Empty;
+        MSG.Default.Send(new ScrollToCurrentItemMessage(), Token.PleaseScrollToCurrentItem);
+    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(GoToControlsIndex))]
+    private bool showGoToInput = false;
+
+    [ObservableProperty]
+    private string gotoInput = string.Empty;
+
+    public int GoToControlsIndex => ShowGoToInput ? 1000 : -1;
+
+    [ObservableProperty]
+    private bool noMessageFound = false;
+
+    partial void OnNoMessageFoundChanged(bool value)
+    {
+        Task.Run(async () =>
+        {
+            await Task.Delay(2500);
+        }).Await(() =>
+        {
+            NoMessageFound = false;
+        });
+    }
 }
 
 public enum JumpMode

@@ -19,6 +19,24 @@ public sealed partial class HomePage : Page
     {
         ViewModel = App.GetService<HomeViewModel>();
         InitializeComponent();
+        Messenger.Default.Register<HomePage, FocusOnInputBoxMessage, string>(this, Token.FocusOnInputTextBox,
+            (me, msg) => FocusOnTextBoxOnShow(me, msg));
+        Messenger.Default.Register<HomePage, ScrollToCurrentItemMessage, string>(this, Token.PleaseScrollToCurrentItem,
+            (me, msg) => ScrollMessageToCurrent(me, msg));
+    }
+
+    private void FocusOnTextBoxOnShow(HomePage me, FocusOnInputBoxMessage msg)
+    {
+        gotoInput.Focus(FocusState.Keyboard);
+    }
+
+    private void ScrollMessageToCurrent(HomePage me, ScrollToCurrentItemMessage msg)
+    {
+        try
+        {
+            mainListView.ScrollIntoView(ViewModel.CountingMessages[ViewModel.SelectedMessage]);
+        }
+        catch { }
     }
 
     private void SetJumpMode(object sender, RoutedEventArgs e)
@@ -32,6 +50,23 @@ public sealed partial class HomePage : Page
                 case "confirm": ViewModel.SelectedJump = JumpMode.ConfirmedFiller; break;
             }
         }
+    }
+
+    private void SubmitAttempt(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        if (e.Key == Windows.System.VirtualKey.Escape)
+        {
+            e.Handled = true;
+            ViewModel.GotoInput = string.Empty;
+            ViewModel.ShowGoToInput = false;
+            return;
+        }
+        if (e.Key != Windows.System.VirtualKey.Enter)
+        {
+            return;
+        }
+        e.Handled = true;
+        ViewModel.GoToThisMessageCommand.Execute(null);
     }
 }
 
