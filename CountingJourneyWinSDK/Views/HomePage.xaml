@@ -66,6 +66,18 @@
                         <KeyboardAccelerator Key="S" Modifiers="Control"/>
                     </MenuFlyoutItem.KeyboardAccelerators>                    
                 </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Icon="save"
+                                Text="Save filler list"
+                                Command="{x:Bind ViewModel.UpdateEntireConfirmedFillerListCommand}">
+                    <MenuFlyoutItem.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="S" Modifiers="Menu"/>
+                    </MenuFlyoutItem.KeyboardAccelerators>
+                </MenuFlyoutItem>
+                <MenuFlyoutSeparator/>
+                <MenuFlyoutItem Icon="Save"
+                                Text="Export participants"
+                                Command="{x:Bind ViewModel.WriteParticipantsListCommand}"/>
             </MenuBarItem>
             <MenuBarItem Title="Message">
                 <MenuFlyoutItem Text="Count"
@@ -313,7 +325,13 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <StackPanel Orientation="Horizontal">
-                <ProgressRing Width="24" Height="24"
+                <SymbolIcon Symbol="Save" Margin="0,0,5,0"
+                            ToolTipService.ToolTip="Saving confirmed filler list"
+                            Visibility="{x:Bind ViewModel.SavingFiles, Mode=OneWay}"/>
+                <Rectangle Margin="5,0"
+                           Visibility="{x:Bind ViewModel.SavingFiles, Mode=OneWay}"/>
+
+                <ProgressRing Width="18" Height="18"
                               ToolTipService.ToolTip="Counting..."
                               Visibility="{x:Bind ViewModel.IsCountingRightNow, Mode=OneWay}"/>
                 <TextBlock FontSize="14" TextAlignment="Left" TextTrimming="CharacterEllipsis"
@@ -335,9 +353,14 @@
                 <TextBlock Text="{x:Bind ViewModel.Messages.Count, Mode=OneWay}" VerticalAlignment="Center"
                            Margin="5,0"/>
                 <TextBlock Text="|" Margin="5,0"/>
-                <FontIcon Glyph="&#xE107;"
-                          ToolTipService.ToolTip="Total filler messages"/>
+                <FontIcon Glyph="&#xE11B;"
+                          ToolTipService.ToolTip="All filler messages"/>
                 <TextBlock Text="{x:Bind ViewModel.TotalFiller, Mode=OneWay}" VerticalAlignment="Center"
+                           Margin="5,0"/>
+                <TextBlock Text="|" Margin="5,0"/>
+                <FontIcon Glyph="&#xE107;"
+                          ToolTipService.ToolTip="Confirmed filler messages"/>
+                <TextBlock Text="{x:Bind ViewModel.ConfirmedFillers.Count, Mode=OneWay}" VerticalAlignment="Center"
                            Margin="5,0"/>
             </StackPanel>
         </Grid>

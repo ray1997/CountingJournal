@@ -24,6 +24,15 @@ public partial class Message : ObservableObject
 
     [ObservableProperty]
     private string? attachments;
+
+    public static bool IsSame(Message a, Message b)
+    {
+        if (Equals(a.Sender?.UserID, b.Sender?.UserID) &&
+            Equals(a.Content, b.Content) &&
+            Equals(a.SendAt.Ticks, b.SendAt.Ticks))
+            return true;
+        return false;
+    }
 }
 
 public partial class User : ObservableObject

@@ -14,6 +14,7 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Controls;
+using System.Text;
 
 namespace CountingJournal.ViewModels;
 
@@ -64,33 +65,52 @@ public partial class HomeViewModel : ObservableRecipient
         if (fillerMSG.ConfirmAsFiller)
         {
             //Add to filler list
+            var hasIts = ConfirmedFillers.FirstOrDefault(search => Message.IsSame(search, fillerMSG.ConfirmFiller));
+            if (hasIts is not null)
+                return;
             ConfirmedFillers.Add(fillerMSG.ConfirmFiller);
-            //Save to json
-            DirectoryInfo folder = new(@"D:\UserData\Desktop\Counting-20221026-1800\Fillers");
-            if (!folder.Exists)
-                folder.Create();
-            string fileName = $"{fillerMSG.ConfirmFiller.SendAt.Ticks}.json";
-            File.WriteAllTextAsync(Path.Join(folder.FullName, fileName), JsonSerializer.Serialize<Message>(fillerMSG.ConfirmFiller, 
-                new JsonSerializerOptions() 
-                { 
-                    WriteIndented = true 
-                }));
         }
         else
         {
-            if (!ConfirmedFillers.Contains(fillerMSG.ConfirmFiller))
+            var hasIts = ConfirmedFillers.FirstOrDefault(search => Message.IsSame(search, fillerMSG.ConfirmFiller));
+            if (hasIts is Message found)
+                ConfirmedFillers.Remove(found);
+        }
+        //Update list
+        _fileDebouncer.Debounce(5000, () =>
+        {
+            if (SavingFiles)
+                return;
+            SavingFiles = true;
+            UpdateEntireConfirmedFillerList().Await(() =>
             {
-                return;
-            }
-            ConfirmedFillers.Remove(fillerMSG.ConfirmFiller);
-            string fileName = $"{fillerMSG.ConfirmFiller.SendAt.Ticks}.json";
-            DirectoryInfo folder = new(@"D:\UserData\Desktop\Counting-20221026-1800\Fillers");
-            if (!folder.Exists)
-                return;
-            FileInfo savedFiller = new(Path.Join(folder.FullName, fileName));
-            if (!savedFiller.Exists)
-                return;
-            savedFiller.Delete();
+                SavingFiles = false;
+            });
+        });
+    }
+
+    [ObservableProperty]
+    bool savingFiles = false;
+
+    Debouncer _fileDebouncer = new();
+    [RelayCommand]
+    public async Task UpdateEntireConfirmedFillerList()
+    {
+        var folder = await StorageFolder.GetFolderFromPathAsync(@"D:\UserData\Desktop\Counting-20221026-1800\");
+        var fillerFolder = await folder.TryGetItemAsync("Fillers");
+        if (fillerFolder is StorageFolder foundFF)
+            await foundFF.DeleteAsync();
+        var ff = await folder.CreateFolderAsync("Fillers");
+
+        var confirmedFillersCopy = ConfirmedFillers.ToList();
+        foreach (var filler in confirmedFillersCopy)
+        {
+            var jsonFile = await ff.CreateFileAsync($"[{filler.SendAt.Ticks:X}]{filler.Sender.UserID}.json");
+            var json = JsonSerializer.Serialize<Message>(filler, new JsonSerializerOptions()
+            {
+                WriteIndented = true
+            });
+            await FileIO.WriteTextAsync(jsonFile, json);
         }
     }
 
@@ -101,17 +121,21 @@ public partial class HomeViewModel : ObservableRecipient
         //StorageFile storageFile = await storageFolder.GetFileAsync(filename);
         //var stream = System.IO.File.Open(storageFile.Path, FileMode.Open);
         //bool check = stream is FileStream;
-        if (CSVFile is null)
-            await GetCSVFile();
+        //if (CSVFile is null)
+        //    await GetCSVFile();
 
-        var stream = File.Open(CSVFile.Path, FileMode.Open);
-        if (stream is null)
-            return;
-        using var reader = new StreamReader(stream);
-        using var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture);
-        csv.Context.RegisterClassMap<MessageMapper>();
-        var items = csv.GetRecords<Message>().Select(msg => new MessageViewModel(msg, ConfirmedFillers.Any(confirm => msg.SendAt.Ticks == confirm.SendAt.Ticks)));
-        Messages = new ObservableCollection<MessageViewModel>(items);
+        //var stream = File.Open(CSVFile.Path, FileMode.Open);
+        //if (stream is null)
+        //    return;
+        //using var reader = new StreamReader(stream);
+        //using var csv = new CsvHelper.CsvReader(reader, System.Globalization.CultureInfo.InvariantCulture);
+        //csv.Context.RegisterClassMap<MessageMapper>();
+        //var items = csv.GetRecords<Message>().Select(msg => new MessageViewModel(msg, ConfirmedFillers.Any(confirm => Message.IsSame(confirm, msg))));
+        var finalFile = @"D:\UserData\Desktop\Counting-20221026-1800\finalCountTo10k.json";
+        var finalText = await File.ReadAllTextAsync(finalFile);
+        var list = JsonSerializer.Deserialize<List<Message>>(finalText);
+
+        Messages = new ObservableCollection<MessageViewModel>(list.Select(msg => new MessageViewModel(msg)));
         //CountingMessages = new(Messages.Select(i => IsCounting.Decide(i)));
     }
 
@@ -191,22 +215,22 @@ public partial class HomeViewModel : ObservableRecipient
             bool triedConvert = false;
             bool isReferenceCheck = false;
             bool isPicCheck = false;
-            await Task.Run(() =>
-            {
-                Debug.WriteLine($"Attemp parsing number: {msg.Content}" +
-                $"\r\nNumber | Spread | TH Num | TH Txt |  Yamok |  Roman |     .9 |    Pow |  Weird |    Ref |    Pic" +
-                $"\r\n{(triedFilterOnlyNumber ? "Y" : "n"),-6} | " +
-                $"{(presumeAllNumberSpread ? "Y" : "n"),-6} | " +
-                $"{(triedConvertFromThaiNum ? "Y" : "n"),-6} | " +
-                $"{(triedThaiText ? "Y" : "n"),-6} | " +
-                $"{(triedYamokConvert ? "Y" : "n"),-6} | " +
-                $"{(triedRoman ? "Y" : "n"),-6} | " +
-                $"{(isDotNine ? "Y" : "n"),-6} | " +
-                $"{(triedCalculate ? "Y" : "n"),-6} | " +
-                $"{(triedConvert ? "Y" : "n"),-6} | " +
-                $"{(isReferenceCheck ? "Y" : "n"),-6} | " +
-                $"{(isPicCheck ? "Y" : "n"),-6} | ");
-            });
+            //await Task.Run(() =>
+            //{
+            //    Debug.WriteLine($"Attemp parsing number: {msg.Content}" +
+            //    $"\r\nNumber | Spread | TH Num | TH Txt |  Yamok |  Roman |     .9 |    Pow |  Weird |    Ref |    Pic" +
+            //    $"\r\n{(triedFilterOnlyNumber ? "Y" : "n"),-6} | " +
+            //    $"{(presumeAllNumberSpread ? "Y" : "n"),-6} | " +
+            //    $"{(triedConvertFromThaiNum ? "Y" : "n"),-6} | " +
+            //    $"{(triedThaiText ? "Y" : "n"),-6} | " +
+            //    $"{(triedYamokConvert ? "Y" : "n"),-6} | " +
+            //    $"{(triedRoman ? "Y" : "n"),-6} | " +
+            //    $"{(isDotNine ? "Y" : "n"),-6} | " +
+            //    $"{(triedCalculate ? "Y" : "n"),-6} | " +
+            //    $"{(triedConvert ? "Y" : "n"),-6} | " +
+            //    $"{(isReferenceCheck ? "Y" : "n"),-6} | " +
+            //    $"{(isPicCheck ? "Y" : "n"),-6} | ");
+            //});
 
         retry:
             shouldSwitchAnchor = IsCountingDeciderV2.ShouldAddIn(previous, next, acceptableGapSize);
@@ -643,6 +667,72 @@ public partial class HomeViewModel : ObservableRecipient
         {
             NoMessageFound = false;
         });
+    }
+
+    [RelayCommand]
+    public async Task WriteParticipantsList()
+    {
+        //var senders = Messages.Select(msg => msg.Sender.UserID).Distinct().ToList();
+        //var realSender = new List<User>();
+        //foreach (var sender in senders)
+        //{
+        //    if (Messages.LastOrDefault(msg => msg.Sender.UserID == sender) is Message found)
+        //    {
+        //        realSender.Add(found.Sender);
+        //    }
+        //}
+        //var json = JsonSerializer.Serialize(realSender, new JsonSerializerOptions()
+        //{
+        //    WriteIndented = true,
+        //    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+        //});
+        //var file = new FileInfo(@"D:\UserData\Desktop\Counting-20221026-1800\participants.json");
+        //var delayInfo = CountingMessages.Select(msg => msg.SendAt).ToList();
+        //List<double> delayTime = new();
+        //for (var i = 0; i < delayInfo.Count; i++)
+        //{
+        //    if (i == 0)
+        //        continue;
+        //    var delay = delayInfo[i] - delayInfo[i - 1];
+        //    delayTime.Add(delay.TotalSeconds);
+        //}
+        //var info = String.Join("\r\n", delayTime);
+        //var daySend = CountingMessages.Select(msg => msg.SendAt.Day).ToList();
+        //var hourSend = CountingMessages.Select(msg => msg.SendAt.Hour).ToList();
+        //StringBuilder bd = new();
+        //bd.AppendLine("Hour\tDay");
+        //for (int i = 0;i < daySend.Count; i++)
+        //{
+        //    bd.AppendLine($"{hourSend[i]}\t{daySend[i]}");
+        //}
+        //Consolidate day
+        Dictionary<string, int> countADay = new();
+        //Distinct day
+        DateOnly min = new(2022, 4, 28);
+        DateOnly max = new(2022, 10, 29);
+        for (DateOnly date = new(2022,4,28);date < max; date = date.AddDays(1))
+        {
+            if (!countADay.ContainsKey(date.ToShortDateString()))
+                countADay.Add(date.ToShortDateString(), 0);
+        }
+        foreach (var msg in CountingMessages)
+        {
+            if (countADay.ContainsKey(msg.SendAt.Date.ToShortDateString()))
+                countADay[msg.SendAt.Date.ToShortDateString()]++;
+            else
+            {
+                countADay.Add(msg.SendAt.Date.ToShortDateString(), 1);
+            }
+        }
+        StringBuilder bd = new();
+        bd.AppendLine("Day\tMessage");
+        foreach (var item in countADay)
+        {
+            bd.AppendLine($"{item.Key}\t{item.Value}");
+        }
+
+        var file = new FileInfo(@"D:\UserData\Desktop\Counting-20221026-1800\sendPerDay.txt");
+        await File.WriteAllTextAsync(file.FullName, bd.ToString());
     }
 }
 
